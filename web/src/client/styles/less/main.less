@@ -1,0 +1,173 @@
+body {
+  font-family: 'Julius Sans One', 'Helvetica', sans-serif;
+  letter-spacing: 0.1em;
+  height: 100vh;
+  font-size: 2vh;
+  line-height: 1.7em;
+  text-transform: uppercase;
+}
+
+a {
+  text-decoration: none;
+  color: lighten(#000000, 30%);
+}
+
+button {
+  background: none;
+  border: none;
+  outline: none;
+  height: 1.5em;
+  display: inline-block;
+
+  svg {
+    height: 1.5em;
+  }
+}
+
+button:focus, div:focus, img:focus, a:focus, td:focus {
+  outline: 0;
+}
+
+.vertical-fix {
+  height: 33.33%;
+  width: 100%;
+}
+
+.logo-cell {
+  height: 100%;
+}
+
+
+.logo {
+  height: 2.6em;
+  width: auto;
+}
+
+.soc-icon {
+  display: inline-block;
+  text-align: center;
+  padding: 0 0.2em;
+  min-width: 4em;
+  margin-top: 0.25em;
+  vertical-align: middle;
+  svg {
+    fill: #e6e6e6;
+  }
+}
+
+#closepost {
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+
+  svg {
+    position: absolute;
+    top: 0;
+    right: 1em;
+    bottom: 0;
+  }
+}
+
+
+.icon-f:hover svg {
+  fill: #3b5998!important;
+}
+
+.icon-y:hover svg{
+  fill: #3C588C!important;
+}
+
+.icon-s:hover svg{
+  fill: #ff3a00!important;
+}
+
+.icon-m:hover svg{
+  fill: #000!important;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translate(0, 0)
+  }
+  20% {
+    transform: translate(0, 0)
+  }
+  70% {
+    transform: translate(-50%, 0)
+  }
+  100% {
+    transform: translate(0, 0)
+  }
+}
+
+/* The element to apply the animation to */
+.track-scroll {
+  animation: scroll 30s infinite;
+  animation-direction: alternate;
+}
+
+/* Player animation */
+
+
+.player-btn-active {
+  fill: #000;
+}
+
+.player-btn {
+  fill: #fff;
+}
+
+.scroll-left {
+  overflow: hidden;
+  position: relative;
+}
+.scroll-left  {
+  .scroll {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    /* Starting position */
+
+    transform:translateX(0%);
+    /* Apply animation to this element */
+
+    animation: scroll-left 20s linear infinite;
+  }
+  /* Move it (define the animation) */
+  @keyframes scroll-left {
+
+    0% {
+      transform: translateX(0%);
+    }
+
+    50% {
+      transform: translateX(-100%);
+      visibility: hidden;
+    }
+
+    51% {
+      transform: translateX(100%);
+      visibility: hidden;
+    }
+    52% {
+      visibility: visible;
+    }
+
+    100% {
+      transform: translateX(0%);
+    }
+  }
+
+  .stop {
+    animation-play-state: paused;
+  }
+}
+
+.poster-link {
+  display: inline-block;
+  height: 100%;
+}
+
+.hidden-logo {
+  display: none;
+}

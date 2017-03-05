@@ -1,0 +1,319 @@
+@import "lib/bootstrap/bootstrap.less";
+@import "lib/bootstrap/variables.less";
+@import (inline) "css/fontface.css";
+
+body{
+  font-family: 'Roboto Slab', serif;
+  background: url('/img/gplaypattern.png') repeat;
+}
+
+.dashboard{
+  // background-color: #fff;
+}
+.content{
+  margin-top: 80px;
+  &.dashboard{
+
+  }
+}
+
+.top-offset {
+  margin-top: 50px;
+}
+
+.dashboard-nav{
+  .navbar-header{
+    .navbar-brand#dash-logo{
+      width: 60px;
+      position: relative;
+      svg{
+        position: absolute;
+        top: 6px;
+        left:20px;
+        // fill: #1A3939;
+        fill: @navbar-default-brand-color;
+        &:hover{
+          fill: @navbar-default-brand-hover-color;
+        }
+      }
+
+    }
+  }
+}
+
+.dashboard{
+  .panel{
+    .panel-heading{
+      padding: 10px 0;
+      h1{
+        padding: 0 15px;
+      }
+
+      .info-box{
+        padding: 10px 15px;
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    }
+
+    .panel-body {
+      padding: 0 0 15px 0;
+      background: url('/img/gplaypattern.png') repeat;
+
+      &.posters{
+        padding-top: 20px;
+        background-image: none;
+        background-color: #fff;
+        .posters-list{
+          .controll-btns{
+            margin-bottom: 20px;
+          }
+          .poster-item{
+            .clearfix();
+            padding: 10px 0;
+            position: relative;
+            margin: 4px 0;
+            border-bottom: 1px #ddd solid;
+            .poster-image{
+              height: inherit;
+              img{
+                height: 100px;
+              }
+            }
+            .poster-id{
+              font-size: 0.8em;
+              color: #ccc;
+              float: right;
+            }
+            &:before, &:after{
+              content: " ";
+              display: table;
+            }
+          }
+        }
+        p{
+          overflow-wrap: break-word;
+        }
+
+      }
+
+      .table-container {
+        background-color: #fff;
+        padding: 20px 0;
+        margin-bottom: 20px;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+
+        .settings-editor {
+          margin: 0 0 20px 0;
+          textarea{
+            padding: 6px;
+            width: 100%;
+            min-height: 200px;
+            resize: none;
+            border: none;
+            font-family: "Consolas";
+            &:focus {
+                outline: none !important;
+                border:none;
+                box-shadow: none;
+            }
+          }
+        }
+
+      }
+    }
+  }
+}
+
+.footer{
+  padding: 10px 0 40px 0;
+  ul{
+    padding: 0;
+    list-style: none;
+  }
+  a{
+    color: @navbar-default-brand-color;
+    &:hover{
+      color: @navbar-default-brand-hover-color;
+    }
+  }
+    li.active{
+      a{
+        color: darken(@navbar-default-brand-color,25%);
+      }
+
+      &:after{
+        content: ' <';
+        color: #ccc;
+      }
+    }
+}
+
+// tables
+//
+
+.settings-table{
+  margin: 0;
+  thead{
+    th{
+      &:nth-child(1){
+        text-align: center;
+        width: 50px;
+      }
+      &:nth-child(2){
+        width: 30%;
+      }
+    }
+  }
+  tbody{
+    tr td{
+      &:nth-child(1){
+        text-align: center;
+      }
+    }
+  }
+}
+
+// row with action buttons
+//
+
+.controll-btns{
+  border-top : 1px #DADADA solid;
+  border-bottom: 1px #DADADA solid;
+  background-color: rgba(0,0,0,0.05);
+
+  padding: 0 15px;
+  .btn-group{
+    border-radius: 0;
+    .btn{
+      border-top: none;
+      border-bottom: none;
+
+      margin-right: 10px;
+      &:first-child, &:last-child{
+        border-radius: 0;
+      }
+    }
+  }
+}
+
+// loggin in journal
+//
+
+.panel.journal{
+  .panel-body{
+    background-color: #fff;
+    background-image: none;
+    .journal-control-btns{
+      padding: 10px 10px 0 10px;
+    }
+    table.table.journal-table{
+      margin: 0;
+
+       tr {
+        border-bottom: 1px #C8C8C8 solid;
+
+        td:first-child{
+          text-align: left;
+          width: 15%;
+          min-width: 170px;
+          small{
+            display: block;
+            color: #909090;
+          }
+        }
+        td:last-child{
+          width: 85%;
+        }
+      }
+    }
+  }
+}
+
+.poster-edit{
+  img{
+    width: 100%;
+  }
+  margin: 0 0 20px 0;
+  padding: 20px 0;
+  border-bottom: 1px #ddd solid;
+  background-color: #fff;
+}
+
+
+// PLAYLISTS
+
+.reload-playlist {
+  .btn;
+  .btn-warning;
+  .pull-right;
+}
+
+.set-playlist {
+  .btn;
+  .btn-danger;
+
+}
+
+.upload-playlist {
+  .btn;
+  .btn-default;
+}
+
+.scan-folder {
+  .btn;
+  .btn-info;
+}
+
+
+.playlist-window {
+  height: 500px;
+  width: 100%;
+  padding: 0.5em;
+  overflow-y: scroll;
+  background-color: white;
+  border-top: 1px solid @gray;
+  border-bottom: 1px solid @gray;
+
+  li {
+    padding: 0.2em 0.5em;
+  }
+
+}
+
+.playlist-title {
+  height: 50px;
+  text-indent: 1em;
+  line-height: 50px;
+  font-size: 16px;
+}
+
+.playlist-tracks {
+  list-style: none;
+
+
+  .time {
+    color: #583EAD;
+  }
+}
+
+
+// Events
+
+.events-list {
+  table-layout: fixed;
+  width: 100%;
+
+  .title {
+    width: 40%;
+  }
+  .date {
+    width: 20%;
+  }
+  .duration{
+    width: 60px;
+  }
+  .edit, .remove {
+    width: 50px;
+  }
+}

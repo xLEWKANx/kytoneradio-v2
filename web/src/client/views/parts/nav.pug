@@ -1,0 +1,56 @@
+.offset-top
+
+.header-wrapper(ng-controller="postCtrl as post")
+  .header-left
+    table.header-table
+      tr.top-row
+        td.soc-icons(colspan="2")
+          a.soc-icon.icon-s(href='https://soundcloud.com/kytone' target="_blank" soc-icon tabindex='-1')
+            include ../svg/icons/soundcloud.svg
+          a.soc-icon.icon-f(href='https://www.facebook.com/kytoneradio' target='_blank' tabindex='-1' soc-icon)
+            include ../svg/icons/facebook.svg
+          a.soc-icon.icon-y(href='https://instagram.com/kytoneradio/' target="_blank" soc-icon tabindex='-1')
+            include ../svg/icons/insta.svg
+          a.soc-icon.icon-m(ng-click="post.openPost($event, 0, 0, post.startCoords);" tabindex='-1' soc-icon)
+            include ../svg/icons/mistery.svg
+
+      tr.top-center-row
+        td.border-bottom
+        td
+      tr.bottom-center-row
+        td.time
+          span(time-update)#clock= timenow
+        td
+      tr.bottom-row
+        td.border-right
+        td#player_status {{main.playerStatus}}
+      tr.tech-row
+        td
+        td
+      .post-left(ng-show="post.isOpened()" class="ng-hide")
+        img.post-image(ng-src="{{post.postData.currentPost.pictureUrl}}")
+  .header-right
+    table.header-table(ng-controller="scheduleCtrl as schedule")
+      tr.top-row
+        td.border-right
+        td#closepost(ng-show="post.isOpened()" class="ng-hide" ng-click="post.closePost()")
+          | CLOSE
+      tr
+        td(colspan="2").playlist-section#plPlace
+          table#playlist.playlist-table
+            tr.playlist-track(ng-repeat="playlist in schedule.next | reverse")
+              td.track-time {{playlist.startTime}} - {{playlist.endTime}}
+              td.track-title.scroll-left
+                div(scroll) {{playlist.track.title}}
+      tr.bottom-row
+        td
+          .logo-cell
+            .logo
+              include ../svg/ky-logo.svg
+        td.border-left
+          | KYTONE RADIO
+      tr.tech-row
+        td
+        td
+      .post-right(ng-show="post.isOpened()" class="ng-hide" )
+        span.post-content(marked="post.postData.currentPost.content")

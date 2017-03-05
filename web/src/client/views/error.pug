@@ -1,0 +1,12 @@
+extends layouts/head
+
+block content
+  .error-stack
+      pre= message
+      p= error.status
+      //- pre #{error.stack}
+      a.back(href='/.') Go home
+
+block footer
+
+block player

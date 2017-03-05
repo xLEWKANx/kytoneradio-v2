@@ -1,0 +1,109 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models",
+      "../node_modules/loopback-component-passport/lib/models"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../common/mixins",
+      "./mixins"
+    ]
+  },
+  "User": {
+    "dataSource": "memory",
+    "public": false
+  },
+  "accessToken": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "userCredential": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "userIdentity": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "ACL": {
+    "dataSource": "memory",
+    "public": false
+  },
+  "RoleMapping": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "Role": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "AppModel": {
+    "dataSource": "memory",
+    "public": false
+  },
+  "Page": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "Note": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "Post": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "Slide": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "Setting": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "Product": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "Category": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "Event": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "AuthProvider": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "user": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "Meta": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "Track": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "Playlist": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "Player": {
+    "dataSource": "memory",
+    "public": true
+  },
+  "musicStorage": {
+    "dataSource": "storage",
+    "public": true
+  }
+}

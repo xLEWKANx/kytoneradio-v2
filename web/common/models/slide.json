@@ -1,0 +1,35 @@
+{
+  "name": "Slide",
+  "plural": "slides",
+  "base": "AppModel",
+  "properties": {
+    "pictureUrl": {
+      "type": "string",
+      "required": true
+    },
+    "content": {
+      "type": "string",
+      "meta": {
+        "formType": "textarea"
+      }
+    },
+    "innerIndex": {
+      "type": "number",
+      "required": "true"
+    },
+    "outerIndex": {
+      "type": "number",
+      "required": "true"
+    },
+    "local": {
+      "type": "boolean"
+    },
+    "outerUrl": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

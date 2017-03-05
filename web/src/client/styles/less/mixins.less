@@ -1,0 +1,81 @@
+// offsets
+
+.offset-top {
+  height: 4%;
+}
+
+// z-indexes
+
+.content-layer {
+  z-index: 1;
+}
+
+.slides-layer {
+  z-index: 10;
+}
+
+.player-layer {
+  z-index: 100;
+}
+
+.separator-layer {
+  z-index: -1000;
+}
+
+// borders
+
+.border-right {
+  border-right: 2px solid @border-color;
+  box-sizing: border-box;
+}
+
+.border-left {
+  border-left: 2px solid @border-color;
+  box-sizing: border-box;
+}
+
+.border-top {
+  border-top: 2px solid @border-color;
+  box-sizing: border-box;
+}
+
+.border-bottom {
+  border-bottom: 2px solid @border-color;
+  box-sizing: border-box;
+}
+
+.border-fix {
+  border-bottom: 2px solid transparent;
+  box-sizing: border-box;
+}
+
+// tables
+
+.table {
+  display: table;
+  table-layout: fixed;
+}
+
+.table-cell {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.clearfix() {
+  &:before,
+  &:after {
+    content: " "; // 1
+    display: table; // 2
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.visible {
+  visibility: visible;
+}

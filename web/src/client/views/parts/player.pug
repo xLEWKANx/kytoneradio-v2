@@ -1,0 +1,34 @@
+//- audio
+audio(player-status)#player
+  source(src='api/player/stream',type="audio/mpeg" crutch)
+
+.player
+  .player-wrapper
+    .player-left
+      table.player-table
+        tr.tech-row
+          td
+          td
+        tr.main-row
+          td.buttons
+            button(ng-click="main.control('play')")#play
+              include ../svg/icons/play.svg
+            button(ng-click="main.control('pause')")#pause
+              include ../svg/icons/pause.svg
+          td.volume
+            .volume-container
+              div(volume-regulator)#slider
+        tr.tech-row
+          td
+          td
+    .player-right
+      table.player-table
+        tr.tech-row
+          td
+        tr.main-row
+          td
+            .now-play(title-update)
+              p#track-title
+                | Kytone Net Radio Station
+        tr.tech-row
+          td

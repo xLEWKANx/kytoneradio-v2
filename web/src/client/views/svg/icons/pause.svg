@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 27.5 40">
+  <path class="animate-zone player-btn" d="M8.75 40H0V1.25h8.75V40z"/>
+  <path d="M1.25 38.75h7.5V1.25h-7.5v37.5zM10 40H0V0h10v40z"/>
+  <path class="animate-zone player-btn" d="M26.25 40H17.5V1.25h8.75V40z"/>
+  <path d="M18.75 38.75h7.5V1.25h-7.5v37.5zM27.5 40h-10V0h10v40z"/>
+</svg>

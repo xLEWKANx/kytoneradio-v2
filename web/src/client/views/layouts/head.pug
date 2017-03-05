@@ -1,0 +1,36 @@
+doctype html
+html(ng-app='kytoneApp')
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    meta(name="ROBOTS" content="index, nofollow")
+    meta(name="description" content="Kyiv")
+    title Kytone net radio station
+
+    script(src='http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
+    script(src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js')
+    //- adding context variable
+    block context
+    //- adding application libs
+    script(src='/app/lib.js', type='text/javascript')
+    include styles
+  body(ng-controller="mainCtrl as main")
+    block player
+        //- audio
+        include ../parts/player
+    //- navbar
+    include ../parts/nav
+
+    //- - - - - - - - -
+    //- main  content -
+    //- - - - - - - - -
+    block content
+
+    block footer
+        //- footer
+        include ../parts/footer
+
+
+    block scripts
+        include scripts

@@ -1,0 +1,55 @@
+{
+  "name": "Playlist",
+  "plural": "playlist",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "required": true
+    },
+    "index": {
+      "type": "number",
+      "required": true,
+      "index": {
+        "unique": true
+      }
+    },
+    "name": {
+      "type": "string"
+    },
+    "startTime": {
+      "type": "date",
+      "required": true
+    },
+    "endTime": {
+      "type": "date",
+      "required": true
+    },
+    "duration": {
+      "type": "number",
+      "required": true
+    },
+    "trackId": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "track": {
+      "type": "belongsTo",
+      "model": "Track",
+      "foreignKey": "trackId"
+    },
+    "event": {
+      "type": "hasOne",
+      "model": "Event",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

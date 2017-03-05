@@ -1,0 +1,61 @@
+html
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    title Kytone radio station
+
+    script(src='http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
+    script(src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js')
+    //- adding context variable
+    block context
+    //- adding application libs
+    script(src='/app/lib.js', type='text/javascript')
+    include layouts/styles
+  body
+    .offset-top
+
+    .header-wrapper(ng-controller="postCtrl as post")
+      .header-left
+        table.header-table
+          tr.top-row
+            td.soc-icons(colspan="2")
+              a.soc-icon.icon-s(href='#')
+                include svg/icons/soundcloud.svg
+              a.soc-icon.icon-f(href='https://www.facebook.com/kytoneradio' target='_blank')
+                include svg/icons/facebook.svg
+              a.soc-icon.icon-y(href='#')
+                include svg/icons/youtube.svg
+              a.soc-icon.icon-m(href='#')
+                include svg/icons/mistery.svg
+          tr.top-center-row
+            td.border-bottom
+            td
+          tr.bottom-center-row
+            td.time
+              span#clock= timenow
+                //- 17:22 KYIV (+2 GMT)
+            td
+          tr.bottom-row
+            td.border-right
+          tr.tech-row
+            td
+            td
+      .header-right
+        table.header-table
+          tr.top-row
+            td.border-right
+            td
+          tr
+            td
+            td
+          tr.bottom-row
+            td
+              .logo-cell
+                .logo
+                  include svg/ky-logo.svg
+            td.border-left
+              | KYTONE RADIO
+          tr.tech-row
+            td
+            td

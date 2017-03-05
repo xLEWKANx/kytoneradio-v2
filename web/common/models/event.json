@@ -1,0 +1,24 @@
+{
+  "name": "Event",
+  "plural": "events",
+  "base": "PersistedModel",
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "duration": {
+      "type": "number"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "playlist": {
+      "type": "belongsTo",
+      "model": "Playlist",
+      "foreignKey": "playlistId"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

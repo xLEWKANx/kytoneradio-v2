@@ -1,0 +1,46 @@
+{
+  "name": "Track",
+  "plural": "tracks",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "generated": true,
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true,
+      "index": {
+        "unique": true
+      }
+    },
+    "duration": {
+      "type": "number"
+    },
+    "path": {
+      "type": "string",
+      "required": true
+    },
+    "container": {
+      "type": "string"
+    },
+    "processed": {
+      "type": "boolean"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "playlist": {
+      "type": "hasMany",
+      "model": "Playlist",
+      "foreignKey": "trackId"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

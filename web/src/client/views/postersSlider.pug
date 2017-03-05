@@ -1,0 +1,22 @@
+div(
+  ng-repeat="poster in this.posters.postersArr | orderBy: '+innerIndex'"
+  my-poster-place
+  ng-mousedown="posters.writeCoords($event)"
+  )
+  a(
+    ng-click="posters.openPost($event, poster.outerIndex, poster.innerIndex, posters.startCoords)"
+    ng-if="poster.local"
+    class="poster-link")
+    img(
+      ng-src="{{poster.pictureUrl}}"
+      img-ready
+      poster="this.posters"
+    )
+  a(
+    ng-if="!poster.local" ng-href="{{poster.outerUrl}}" target="_blank" rel="external"
+    class="poster-link")
+    img(
+      ng-src="{{poster.pictureUrl}}"
+      img-ready
+      poster="this.posters"
+    )

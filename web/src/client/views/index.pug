@@ -1,0 +1,33 @@
+extends layouts/head
+
+block content
+
+  div(
+    ng-repeat-start="slider in this.main.slidersArr"
+    class="{{slider.wrapperClass}} cover-wrapper"
+  )
+    .cool-spinner
+      .rect1
+      .rect2
+      .rect3
+      .rect4
+      .rect5
+    slick(
+      ng-controller="postersCtrl as posters"
+      arrows = "true"
+      center-mode="true"
+      class="slick-slider hidden"
+      infinite="true"
+      init-onload="true"
+      data="elemReady"
+      slides-to-show="2"
+      slides-to-scroll="1"
+      speed="{{slider.speed}}"
+      autoplay="false"
+      variable-width="true"
+      ng-show="true"
+      ng-include="'views/postersSlider'"
+      draggable="false"
+      focus-on-select="true"
+    )
+  .player-place(class="{{'player-place-' + slider.outerIndex}}" ng-show="{{slider.playerPlaceShow}}" ng-repeat-end)

@@ -1,5 +1,5 @@
 const MONGODB_URL = process.env.MONGODB_URL || null
-const STORAGE_PATH = process.env.STORAGE_PATH || '../storage'
+const STORAGE_PATH = process.env.STORAGE_PATH || 'storage'
 
 module.exports = {
   db: {

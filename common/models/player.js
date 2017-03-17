@@ -13,7 +13,9 @@ module.exports = function(Player) {
     isPlaying: false
   };
   Player.on("error", err => {
-    throw new Error("Mpd problem", err);
+    Player.log({
+      error: err
+    })
   });
 
   Player.bootstrap = function(cb) {
@@ -190,10 +192,6 @@ module.exports = function(Player) {
   };
 
   Player.log = function(info, cb) {
-    if (typeof error === "function") {
-      cb = error;
-      error = null;
-    }
     let log = Object.assign(
       {
         timestamp: new Date()
@@ -201,7 +199,7 @@ module.exports = function(Player) {
       info
     );
     // Player.create(log, cb)
-    cb();
+    cb && cb();
     // cb(null, [])
   };
 

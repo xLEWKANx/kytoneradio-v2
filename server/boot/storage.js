@@ -1,7 +1,7 @@
 'use strict'
-import path from 'path'
-import Promise from 'bluebird'
-import { default as debug } from 'debug'
+const path = require('path')
+const Promise = require('bluebird')
+const debug = require('debug')
 
 const log = debug('boot:player')
 

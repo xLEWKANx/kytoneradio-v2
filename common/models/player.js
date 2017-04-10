@@ -1,10 +1,10 @@
 "use strict";
-import mpd from "mpd";
-import { default as debug } from "debug";
-import Promise from "bluebird";
-import request from "request";
-
+const mpd = require("mpd");
+const debug = require("debug");
+const Promise = require("bluebird");
+const request = require("request");
 const log = debug("player:Player");
+
 global.Promise = Promise;
 
 module.exports = function(Player) {
@@ -15,7 +15,7 @@ module.exports = function(Player) {
   Player.on("error", err => {
     Player.log({
       error: err
-    })
+    });
   });
 
   Player.bootstrap = function(cb) {
@@ -139,8 +139,8 @@ module.exports = function(Player) {
     });
   };
 
-  Player.moveTrack = function(from, to, cb) {
-    client.sendCommand(mpd.cmd("move", [from, to]), (err, msg) => {
+  Player.moveTrack = function(require, to, cb) {
+    client.sendCommand(mpd.cmd("move", [require, to]), (err, msg) => {
       if (err) return cb(err);
       return cb(null, msg);
     });

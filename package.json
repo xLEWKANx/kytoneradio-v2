@@ -14,14 +14,15 @@
     "url": "https://github.com/beeman/loopback-angular-admin/issues"
   },
   "scripts": {
-    "build": "rimraf dist/dashboard && webpack --bail --progress --profile || true",
-    "dev": "DEBUG=player:* MONGODB_URL=mongodb://admin:radio@ds017256.mlab.com:17256/kytone API_URL=http://localhost:3027/api/ gulp || true",
+    "build": "rimraf dist/dashboard && webpack --bail --progress --profile && gulp client || true",
+    "dev": "NODE_ENV=dev gulp || true",
     "prod": " MONGODB_URL=mongodb://admin:radio@ds017256.mlab.com:17256/kytone NODE_ENV=production API_URL=http://localhost:80/api/ gulp || true",
-    "dev-client": "webpack-dev-server",
+    "dev-dashboard": "webpack-dev-server || true",
+    "dev-client": "gulp watch:client || true",
     "dev-debug": "DEBUG_API=1 API_URL=http://localhost:3027/api/ gulp || true",
     "postinstall": "npm run build || true",
     "pretest": "gulp lint || true",
-    "start": "./node_modules/.bin/babel-node server/server || true",
+    "start": "node server/server || true",
     "test": "NODE_ENV=dev babel-node node_modules/.bin/jasmine || true",
     "build-server": "babel server/ common/ -d dist --copy-files && gulp client || true"
   },
@@ -37,7 +38,7 @@
     "cookie-parser": "1.4.1",
     "cors": "2.7.1",
     "debug": "2.2.0",
-    "dotenv": "2.0.0",
+    "dotenv": "^4.0.0",
     "errorhandler": "1.4.3",
     "eventemitter3": "1.2.0",
     "express-session": "1.13.0",

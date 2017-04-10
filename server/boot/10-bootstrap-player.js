@@ -1,7 +1,6 @@
 'use strict'
-import { default as debug } from 'debug'
-import Promise from 'bluebird'
-
+const debug = require('debug');
+const Promise = require('bluebird');
 const log = debug('player:boot')
 
 module.exports = function (app, next) {

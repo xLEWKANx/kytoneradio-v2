@@ -1,82 +1,94 @@
-'use strict'
-import { default as debug } from 'debug'
+"use strict";
+const debug = require("debug");
 
 // to enable these logs set `DEBUG=boot:02-load-users` or `DEBUG=boot:*`
-const log = debug('boot:02-load-users')
+const log = debug("boot:02-load-users");
 
-module.exports = function (app) {
+module.exports = function(app) {
   // Do not run if we are in codegen mode.
-  if (process.env.ENV === 'codegen') return
+  if (process.env.ENV === "codegen") return;
 
-  if (app.dataSources.db.name !== 'Memory' && !process.env.INITDB) {
-    return
+  if (app.dataSources.db.name !== "Memory" && !process.env.INITDB) {
+    return;
   }
 
-  createDefaultUsers()
+  createDefaultUsers();
 
-  function createDefaultUsers () {
+  function createDefaultUsers() {
+    log("Creating roles and users");
 
-    log('Creating roles and users')
+    const User = app.models.User;
+    const Role = app.models.Role;
+    const RoleMapping = app.models.RoleMapping;
 
-    const User = app.models.User
-    const Role = app.models.Role
-    const RoleMapping = app.models.RoleMapping
+    const users = [];
+    const roles = [
+      {
+        name: "admin",
+        users: [
+          {
+            firstName: "Admin",
+            lastName: "User",
+            email: "admin@admin.com",
+            username: "admin",
+            password: "admin"
+          }
+        ]
+      },
+      {
+        name: "users",
+        users: [
+          {
+            firstName: "Guest",
+            lastName: "User",
+            email: "user@user.com",
+            username: "user",
+            password: "user"
+          }
+        ]
+      }
+    ];
 
-    const users = []
-    const roles = [{
-      name: 'admin',
-      users: [{
-        firstName: 'Admin',
-        lastName: 'User',
-        email: 'admin@admin.com',
-        username: 'admin',
-        password: 'admin',
-      }],
-    }, {
-      name: 'users',
-      users: [{
-        firstName: 'Guest',
-        lastName: 'User',
-        email: 'user@user.com',
-        username: 'user',
-        password: 'user',
-      }],
-    }]
-
-    roles.forEach((role) => {
+    roles.forEach(role => {
       Role.findOrCreate(
-        {where: {name: role.name}}, // find
-        {name: role.name}, // create
+        { where: { name: role.name } }, // find
+        { name: role.name }, // create
         (err, createdRole, created) => {
           if (err) {
-            console.error(`error running findOrCreate(${role.name})`, err)
+            console.error(`error running findOrCreate(${role.name})`, err);
           }
-          (created) ? log('created role', createdRole.name)
-                    : log('found role', createdRole.name)
-          role.users.forEach((roleUser) => {
+          created
+            ? log("created role", createdRole.name)
+            : log("found role", createdRole.name);
+          role.users.forEach(roleUser => {
             User.findOrCreate(
-              {where: {username: roleUser.username}}, // find
+              { where: { username: roleUser.username } }, // find
               roleUser, // create
               (err, createdUser, created) => {
                 if (err) {
-                  console.error('error creating roleUser', err)
+                  console.error("error creating roleUser", err);
                 }
-                (created) ? log('created user', createdUser.username)
-                          : log('found user', createdUser.username)
-                createdRole.principals.create({
-                  principalType: RoleMapping.USER,
-                  principalId: createdUser.id,
-                }, (err, rolePrincipal) => {
-                  if (err) {
-                    console.error('error creating rolePrincipal', err)
+                created
+                  ? log("created user", createdUser.username)
+                  : log("found user", createdUser.username);
+                createdRole.principals.create(
+                  {
+                    principalType: RoleMapping.USER,
+                    principalId: createdUser.id
+                  },
+                  (err, rolePrincipal) => {
+                    if (err) {
+                      console.error("error creating rolePrincipal", err);
+                    }
+                    users.push(createdUser);
                   }
-                  users.push(createdUser)
-                })
-              })
-          })
-        })
-    })
-    return users
+                );
+              }
+            );
+          });
+        }
+      );
+    });
+    return users;
   }
-
-}
+};

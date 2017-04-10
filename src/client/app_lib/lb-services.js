@@ -13,7 +13,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
 (function(window, angular, undefined) {
   'use strict';
 
-  var urlBase = "http://localhost:80/api";
+  var urlBase = "http://0.0.0.0:3027/api";
   var authHeader = 'authorization';
 
   function getHost(url) {
@@ -10509,7 +10509,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
 
             /**
              * @ngdoc method
-             * @name lbServices.Playlist#decIndexFrom
+             * @name lbServices.Playlist#decIndexrequire
              * @methodOf lbServices.Playlist
              *
              * @description
@@ -10541,8 +10541,8 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              *  - `tracks` – `{*=}` -
              */
-            "decIndexFrom": {
-              url: urlBase + "/playlist/decIndexFrom",
+            "decIndexrequire": {
+              url: urlBase + "/playlist/decIndexrequire",
               method: "POST",
             },
 

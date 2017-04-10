@@ -27,6 +27,6 @@ client/coverage
 .cache
 .config
 .npm
-.env
+.env*
 client/lib/lb-services.js
 .vscode

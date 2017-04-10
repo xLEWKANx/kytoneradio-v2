@@ -1,5 +1,5 @@
 'use strict'
-import { default as debug } from 'debug'
+const debug = require('debug');
 
 // to enable these logs set `DEBUG=boot:03-load-content` or `DEBUG=boot:*`
 const log = debug('boot:03-load-content')

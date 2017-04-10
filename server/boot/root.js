@@ -1,7 +1,7 @@
 'use strict'
-import pug from 'pug'
-import path from 'path'
-import moment from 'moment'
+const pug = require('pug');
+const path = require('path');
+const moment = require('moment');
 
 const viewsDir = '../../src/client/views/'
 

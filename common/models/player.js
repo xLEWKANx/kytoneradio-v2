@@ -204,7 +204,7 @@ module.exports = function(Player) {
   };
 
   Player.stream = function(cb) {
-    let stream = request("http://localhost:15002/stream");
+    let stream = request("http://localhost:15001/stream");
     cb(null, stream, "application/octet-stream");
   };
 

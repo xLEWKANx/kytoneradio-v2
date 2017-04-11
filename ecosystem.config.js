@@ -7,7 +7,7 @@ module.exports = {
     // First application
     {
       name: "Kytone Radio",
-      script: "web/dist/server.js",
+      script: "server/server.js",
       env: {
         COMMON_VARIABLE: "true"
       },

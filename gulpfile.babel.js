@@ -52,7 +52,7 @@ gulp.task('loopback:after', () => {
 // The actual generation of the LoopBack Angular SDK
 gulp.task('loopback:codegen', () => gulp
   .src('./server/server.js')
-  .pipe(loopbackAngular({ apiUrl }))
+  .pipe(loopbackAngular())
   .pipe(rename('lb-services.js'))
   .pipe(gulp.dest('./src/client/app_lib'))
   .pipe(gulp.dest('./src/dashboard/lib'))

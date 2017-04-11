@@ -58,7 +58,7 @@ module.exports = (function makeWebpackConfig() {
         // Output path from the view of the page
         // Uses webpack-dev-server in development
         publicPath: (
-          isDev ?  `http://localhost:${clientAppPort}/dashboard` : "/dashboard/"
+           "/dashboard/"
         ),
 
         // Filename for entry points

@@ -13,7 +13,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
  */
 const ENV = process.env.NODE_ENV;
 const isTest = ENV === "test" || ENV === "test-watch";
-const isProd = ENV === "production";
+const isProd = ENV !== "dev";
 const isDev = ENV !== "production";
 console.log("wepback is prod", isProd);
 /**

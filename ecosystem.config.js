@@ -29,7 +29,7 @@ module.exports = {
       ref: "origin/master",
       repo: "git@gitlab.com:bigcup/Kytone.git",
       path: "/var/www/production",
-      "post-deploy": "export STORAGE_PATH=/home/curator/storage && export API_URL=localhost:15002/api/ && export NODE_ENV=production && npm install && pm2 startOrRestart ecosystem.config.js --env production ",
+      "post-deploy": "./post-deploy.sh",
       env: {
         NODE_ENV: "production",
         MONGODB_URL: "mongodb://localhost:27017/kytone",

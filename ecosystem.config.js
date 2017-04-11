@@ -37,7 +37,7 @@ module.exports = {
         PATH: "web/node_modules/.bin",
         STORAGE_PATH: "/home/curator/storage",
         MPD_PORT: 15601,
-        API_URL: "localhost:15080/api"
+        API_URL: "localhost:15002/api/"
       }
     },
     dev: {

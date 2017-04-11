@@ -16,18 +16,6 @@ module.exports = function(app) {
   const promises = [];
 
   const structure = {
-    Post: {
-      count: 15
-    },
-    Event: {
-      count: 15
-    },
-    Note: {
-      count: 15
-    },
-    Page: {
-      count: 15
-    },
     Slide: {
       count: 30
     }

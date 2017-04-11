@@ -16,7 +16,7 @@
   "scripts": {
     "build": "rimraf dist/dashboard && webpack --bail --progress --profile && gulp client || true",
     "dev": "NODE_ENV=dev gulp || true",
-    "prod": " MONGODB_URL=mongodb://admin:radio@ds017256.mlab.com:17256/kytone NODE_ENV=production API_URL=http://localhost:80/api/ gulp || true",
+    "prod": " MONGODB_URL=mongodb://admin:radio@ds017256.mlab.com:17256/kytone NODE_ENV=production API_URL=http://localhost:15080/api/ gulp || true",
     "dev-dashboard": "webpack-dev-server || true",
     "dev-client": "gulp watch:client || true",
     "dev-debug": "DEBUG_API=1 API_URL=http://localhost:3027/api/ gulp || true",

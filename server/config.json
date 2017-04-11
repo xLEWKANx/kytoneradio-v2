@@ -1,7 +1,7 @@
 {
   "restApiRoot": "/api",
   "host": "0.0.0.0",
-  "port": 80,
+  "port": 15080,
   "url": "http://localhost:80/",
   "cookieSecret": "F1FEE670-3C72-11E4-916C-0800200C9A66",
   "remoting": {

@@ -14,6 +14,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ENV = process.env.NODE_ENV;
 const isTest = ENV === "test" || ENV === "test-watch";
 const isProd = ENV === "production";
+const isDev = ENV !== "production";
 console.log("wepback is prod", isProd);
 /**
  * Path to the client application
@@ -57,7 +58,7 @@ module.exports = (function makeWebpackConfig() {
         // Output path from the view of the page
         // Uses webpack-dev-server in development
         publicPath: (
-          isProd ? "/dashboard/" : `http://localhost:${clientAppPort}/dashboard`
+          isDev ?  `http://localhost:${clientAppPort}/dashboard` : "/dashboard/"
         ),
 
         // Filename for entry points

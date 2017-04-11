@@ -152,4 +152,6 @@ gulp.task('watch:client', () => {
 
 });
 
-gulp.task('client', ['loopback', 'styles', 'app', 'app:lib', 'img'])
+gulp.task('client', ['loopback', 'styles', 'app', 'app:lib', 'img'], () => {
+  process.exit(0);
+})

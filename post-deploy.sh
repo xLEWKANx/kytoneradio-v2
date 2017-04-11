@@ -6,3 +6,4 @@ export MPD_PORT=15601
 export API_URL=localhost:15002/api/
 
 npm install && pm2 startOrRestart ecosystem.config.js --env production 
+exit

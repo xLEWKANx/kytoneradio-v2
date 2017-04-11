@@ -8,7 +8,6 @@ import runSequence from 'run-sequence'
 import less from 'gulp-less'
 import autoprefixer from 'gulp-autoprefixer'
 import minifycss from 'gulp-minify-css'
-import notify from 'gulp-notify'
 import concat from 'gulp-concat'
 import ngAnnotate from 'gulp-ng-annotate'
 import uglify from 'gulp-uglify'
@@ -84,13 +83,11 @@ let _paths = {
 
 gulp.task('styles', () => gulp
   .src('src/client/styles/*.less')
-  .pipe(less()).on('error', notify.onError('Error: <%= error.message %>'))
   .pipe(autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
   .pipe(minifycss({ keepSpecialComments: '0' }))
   .pipe(gulp.dest(
     'dist/client/styles'
   ))
-  .pipe(notify('Styles task complete'))
 )
 
 gulp.task('app', () => gulp
@@ -99,7 +96,6 @@ gulp.task('app', () => gulp
     _paths.app + '/**/*.js',
     _paths.app_lib
   ])
-  .pipe(concat('main.js')).on('error', notify.onError('Error: <%= error.message %>'))
   // Annotate before uglify so the code get's min'd properly.
   .pipe(ngAnnotate({
     // true helps add where @ngInject is not used. It infers.

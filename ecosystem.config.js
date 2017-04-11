@@ -30,11 +30,10 @@ module.exports = {
       repo: "git@gitlab.com:bigcup/Kytone.git",
       path: "/var/www/production",
       "pre-deploy": "source ~/.bashrc",
-      "post-deploy": "npm install && pm2 startOrRestart ecosystem.config.js --env production ",
+      "post-deploy": "export API_URL=localhost:15002/api/ npm install && pm2 startOrRestart ecosystem.config.js --env production ",
       env: {
         NODE_ENV: "production",
         MONGODB_URL: "mongodb://localhost:27017/kytone",
-        PATH: "web/node_modules/.bin",
         STORAGE_PATH: "/home/curator/storage",
         MPD_PORT: 15601,
         API_URL: "localhost:15002/api/"
@@ -52,7 +51,6 @@ module.exports = {
       env: {
         NODE_ENV: "dev",
         MONGODB_URL: "mongodb://localhost:27017/kytone",
-        PATH: "web/node_modules/.bin",
         STORAGE_PATH: "/home/curator/storage",
         MPD_PORT: 15601
       }

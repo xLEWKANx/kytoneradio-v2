@@ -14,6 +14,7 @@ import uglify from 'gulp-uglify'
 
 const debugEnabled = process.env.DEBUG_API
 const apiUrl = process.env.API_URL || 'http://0.0.0.0:3027/api'
+console.log('API URL', apiUrl);
 const babelNode = './node_modules/.bin/babel-node'
 const exec = debugEnabled ? `${babelNode} --debug` : `${babelNode}`
 console.log('debugEnabled', debugEnabled)

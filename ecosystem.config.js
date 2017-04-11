@@ -30,7 +30,7 @@ module.exports = {
       repo: "git@gitlab.com:bigcup/Kytone.git",
       path: "/var/www/production",
       "pre-deploy": "source ~/.bashrc",
-      "post-deploy": "npm install && sudo pm2 startOrRestart ecosystem.config.js --env production ",
+      "post-deploy": "npm install && pm2 startOrRestart ecosystem.config.js --env production ",
       env: {
         NODE_ENV: "production",
         MONGODB_URL: "mongodb://localhost:27017/kytone",
@@ -48,7 +48,7 @@ module.exports = {
       repo: "git@gitlab.com:bigcup/Kytone.git",
       path: "/var/www/development",
       "pre-deploy": "source ~/.bashrc",
-      "post-deploy": "npm install && sudo pm2 startOrRestart ecosystem.config.js --env dev",
+      "post-deploy": "npm install && pm2 startOrRestart ecosystem.config.js --env dev",
       env: {
         NODE_ENV: "dev",
         MONGODB_URL: "mongodb://localhost:27017/kytone",

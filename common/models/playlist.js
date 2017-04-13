@@ -130,7 +130,7 @@ module.exports = function(Playlist) {
     return moment(date).add(duration, "seconds").toDate();
   };
 
-  Playlist.remoteMethod("decIndexrequire", {
+  Playlist.remoteMethod("decIndexFrom", {
     accepts: {
       arg: "index",
       type: "number"
@@ -231,16 +231,14 @@ module.exports = function(Playlist) {
   };
 
   Playlist.prototype.setIndex = function(cb) {
-    Playlist.count(
+    Playlist.findOne(
       {
-        index: {
-          gte: 0
-        }
+        order: 'index DESC'
       },
-      (err, count) => {
+      (err, track) => {
         if (err) return cb(err);
-        log("set index", count);
-        this.index = count;
+        this.index = track ? track.index + 1 : 0;
+        log("set index", this.index, "for", this.name);
         return cb(null, this);
       }
     );
@@ -285,7 +283,7 @@ module.exports = function(Playlist) {
     });
   };
 
-  Playlist.prototype.setTimerequirePrev = function(cb) {
+  Playlist.prototype.setTimeFromPrev = function(cb) {
     log("set time for", this);
     Playlist.findOnePromised({
       where: {
@@ -373,66 +371,66 @@ module.exports = function(Playlist) {
     return track
       .setIndexPromised()
       .then(track => {
-        return track.setTimerequirePrevPromised();
+        return track.setTimeFromPrevPromised();
       })
       .catch(next);
   }
 
-  Playlist.observe("before delete", (ctx, next) => {
-    let Player = Playlist.app.models.Player;
+  // Playlist.observe("before delete", (ctx, next) => {
+  //   let Player = Playlist.app.models.Player;
 
-    if (ctx.options.skip) return next();
-    if (ctx.where && ctx.where.id) {
-      log("before delete", ctx.where);
-      let id = ctx.where.id;
-      Playlist.findByIdPromised(id)
-        .then(track => {
-          console.log("track", track);
-          ctx.hookState.deletedIndex = track.index;
-          return Player.deleteTrackPromised(track.index);
-        })
-        .then(track => {
-          return Playlist.findOnePromised({
-            where: { index: track.index - 1 }
-          });
-        })
-        .then(prev => {
-          ctx.hookState.prevTrack = prev;
-        })
-        .catch(next)
-        .finally(() => next());
-    } else
-      next();
-  });
+  //   if (ctx.options.skip) return next();
+  //   if (ctx.where && ctx.where.id) {
+  //     log("before delete", ctx.where);
+  //     let id = ctx.where.id;
+  //     Playlist.findByIdPromised(id)
+  //       .then(track => {
+  //         console.log("track", track);
+  //         ctx.hookState.deletedIndex = track.index;
+  //         return Player.deleteTrackPromised(track.index);
+  //       })
+  //       .then(track => {
+  //         return Playlist.findOnePromised({
+  //           where: { index: track.index - 1 }
+  //         });
+  //       })
+  //       .then(prev => {
+  //         ctx.hookState.prevTrack = prev;
+  //       })
+  //       .catch(next)
+  //       .finally(() => next());
+  //   } else
+  //     next();
+  // });
 
-  Playlist.observe("after delete", (ctx, next) => {
-    if (ctx.options.skip) return next();
-    log("after delete", ctx.where, ctx.hookState);
-    if (ctx.hookState && isFinite(ctx.hookState.deletedIndex)) {
-      let index = ctx.hookState.deletedIndex;
-      Playlist.findPromised({
-        where: {
-          index: {
-            gte: index
-          }
-        }
-      })
-        .then(tracks => {
-          log("after delete: update tracks", tracks);
-          log("after delete: prev track", ctx.hookState.prevTrack);
-          let startTime = ctx.hookState.prevTrack
-            ? ctx.hookState.prevTrack.endTime
-            : new Date();
-          return Playlist.updateTimeAndIndexPromised(tracks, {
-            startTime: startTime,
-            index: index
-          });
-        })
-        .then(() => next())
-        .catch(next);
-    } else
-      return next();
-  });
+  // Playlist.observe("after delete", (ctx, next) => {
+  //   if (ctx.options.skip) return next();
+  //   log("after delete", ctx.where, ctx.hookState);
+  //   if (ctx.hookState && isFinite(ctx.hookState.deletedIndex)) {
+  //     let index = ctx.hookState.deletedIndex;
+  //     Playlist.findPromised({
+  //       where: {
+  //         index: {
+  //           gte: index
+  //         }
+  //       }
+  //     })
+  //       .then(tracks => {
+  //         log("after delete: update tracks", tracks);
+  //         log("after delete: prev track", ctx.hookState.prevTrack);
+  //         let startTime = ctx.hookState.prevTrack
+  //           ? ctx.hookState.prevTrack.endTime
+  //           : new Date();
+  //         return Playlist.updateTimeAndIndexPromised(tracks, {
+  //           startTime: startTime,
+  //           index: index
+  //         });
+  //       })
+  //       .then(() => next())
+  //       .catch(next);
+  //   } else
+  //     return next();
+  // });
 
   Playlist.on("playing", playlistTrack => {
     log(">>> Playling now", playlistTrack);

@@ -13,7 +13,7 @@ import ngAnnotate from 'gulp-ng-annotate'
 import uglify from 'gulp-uglify'
 
 const debugEnabled = process.env.DEBUG_API
-const apiUrl = process.env.API_URL || 'http://0.0.0.0:3027/api'
+const apiUrl = process.env.NODE_ENV === 'dev' ? 'http://0.0.0.0:3027/api' : null;
 console.log('API URL', apiUrl);
 const babelNode = './node_modules/.bin/babel-node'
 const exec = debugEnabled ? `${babelNode} --debug` : `${babelNode}`
@@ -52,7 +52,7 @@ gulp.task('loopback:after', () => {
 // The actual generation of the LoopBack Angular SDK
 gulp.task('loopback:codegen', () => gulp
   .src('./server/server.js')
-  .pipe(loopbackAngular())
+  .pipe(loopbackAngular({ apiUrl }))
   .pipe(rename('lb-services.js'))
   .pipe(gulp.dest('./src/client/app_lib'))
   .pipe(gulp.dest('./src/dashboard/lib'))

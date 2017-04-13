@@ -168,12 +168,12 @@ module.exports = function(Track) {
       cb = position;
       position = null;
     }
-    Player.addTrackPromised(this.name)
+    this.playlist.create({
+        name: this.name,
+        duration: this.duration
+      })
       .then(log => {
-        return this.playlist.create({
-          name: this.name,
-          duration: this.duration
-        });
+        return Player.addTrackPromised(this.name)
       })
       .then(track => cb(null, track))
       .catch(cb);

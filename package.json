@@ -14,7 +14,7 @@
     "url": "https://github.com/beeman/loopback-angular-admin/issues"
   },
   "scripts": {
-    "build": "rimraf dist/dashboard && webpack --bail --progress --profile && gulp client || true",
+    "build": "rimraf dist/dashboard && gulp client && webpack --bail --progress --profile || true",
     "dev": "NODE_ENV=dev gulp || true",
     "prod": " MONGODB_URL=mongodb://admin:radio@ds017256.mlab.com:17256/kytone NODE_ENV=production API_URL=http://localhost:15002/api/ gulp || true",
     "dev-dashboard": "NODE_ENV=dev webpack-dev-server || true",

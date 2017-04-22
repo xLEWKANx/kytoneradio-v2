@@ -3,7 +3,7 @@ require('dotenv').config()
 const loopback = require("loopback");
 const boot = require("loopback-boot");
 const bootstrap = require("./player/10-bootstrap-player");
-const Promise = require('Promise');
+const Promise = require('bluebird');
 
 global.Promise = Promise;
 

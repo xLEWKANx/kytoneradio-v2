@@ -89,40 +89,31 @@ module.exports = function(Playlist) {
     }
   });
 
-  Playlist.createFakeTracks = function(count) {
+  Playlist.createFakeTracks = function (count, tracks = [], cb) {
     let Track = Playlist.app.models.Track;
-
-    const TRACK_DURATION = 60;
-
-    const MOCK_TRACK = new Track({
-      id: 0,
-      name: "test track",
-      processed: true,
-      duration: TRACK_DURATION
-    });
+    const TRACK_DURATION = 30 * 60;
 
     let playlist = [];
     let startTime = new Date();
 
-    for (let i = 0; i < count; i++) {
-      let endTime = Playlist.addSecond(startTime, TRACK_DURATION);
+    const MOCK_TRACK = new Track({
+      name: 'test track',
+      processed: true,
+      duration: TRACK_DURATION
+    })
 
-      let MOCK_PLAYLIST_TRACK = new Playlist({
-        id: i,
-        name: "test playlist track",
-        startTime: startTime,
-        endTime: endTime,
-        duration: TRACK_DURATION,
-        trackId: 0,
-        index: i
-      });
+    let MOCK_PLAYLIST_TRACK = new Playlist({
+      name: 'test playlist track',
+      duration: TRACK_DURATION,
+      index: 0
+    })
 
-      startTime = endTime;
+    MOCK_TRACK.playlist.create(MOCK_PLAYLIST_TRACK, (err, track) => {
+      if (err) return cb(err);
+      if (count === 0) return cb(null, tracks);
 
-      MOCK_PLAYLIST_TRACK.track(MOCK_TRACK);
-      playlist.push(MOCK_PLAYLIST_TRACK);
-    }
-    return playlist;
+      return Playlist.createFakeTracks(count - 1, tracks.concat(track), cb);
+    })
   };
 
   Playlist.addSecond = (date, duration) => {
@@ -375,62 +366,6 @@ module.exports = function(Playlist) {
       })
       .catch(next);
   }
-
-  // Playlist.observe("before delete", (ctx, next) => {
-  //   let Player = Playlist.app.models.Player;
-
-  //   if (ctx.options.skip) return next();
-  //   if (ctx.where && ctx.where.id) {
-  //     log("before delete", ctx.where);
-  //     let id = ctx.where.id;
-  //     Playlist.findByIdPromised(id)
-  //       .then(track => {
-  //         console.log("track", track);
-  //         ctx.hookState.deletedIndex = track.index;
-  //         return Player.deleteTrackPromised(track.index);
-  //       })
-  //       .then(track => {
-  //         return Playlist.findOnePromised({
-  //           where: { index: track.index - 1 }
-  //         });
-  //       })
-  //       .then(prev => {
-  //         ctx.hookState.prevTrack = prev;
-  //       })
-  //       .catch(next)
-  //       .finally(() => next());
-  //   } else
-  //     next();
-  // });
-
-  // Playlist.observe("after delete", (ctx, next) => {
-  //   if (ctx.options.skip) return next();
-  //   log("after delete", ctx.where, ctx.hookState);
-  //   if (ctx.hookState && isFinite(ctx.hookState.deletedIndex)) {
-  //     let index = ctx.hookState.deletedIndex;
-  //     Playlist.findPromised({
-  //       where: {
-  //         index: {
-  //           gte: index
-  //         }
-  //       }
-  //     })
-  //       .then(tracks => {
-  //         log("after delete: update tracks", tracks);
-  //         log("after delete: prev track", ctx.hookState.prevTrack);
-  //         let startTime = ctx.hookState.prevTrack
-  //           ? ctx.hookState.prevTrack.endTime
-  //           : new Date();
-  //         return Playlist.updateTimeAndIndexPromised(tracks, {
-  //           startTime: startTime,
-  //           index: index
-  //         });
-  //       })
-  //       .then(() => next())
-  //       .catch(next);
-  //   } else
-  //     return next();
-  // });
 
   Playlist.on("playing", playlistTrack => {
     log(">>> Playling now", playlistTrack);

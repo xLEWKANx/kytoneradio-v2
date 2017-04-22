@@ -20,8 +20,24 @@ describe('Playlist test', () => {
 
   let firstTrack, secondTrack, thirdTrack
 
-   it('privet', () => {
-    expect('privet').toBe('privet')
+  let simplifyTime = function (date) {
+    return moment(Date.parse(date)).format("YYYY-MM-DD HH-mm")
+  }
+
+  beforeAll((done) => {
+    Playlist.destroyAll({}, done)
+  })
+
+  it('privet', (done) => {
+    Playlist.createFakeTracks(5, undefined, (err, tracks) => {
+      expect(err).toBe(null)
+
+      tracks.reduce((prev, current) => {
+        expect(simplifyTime(prev.endTime)).toBe(simplifyTime(current.startTime))
+        return current;
+      })
+      done();
+    })
   })
 
 })

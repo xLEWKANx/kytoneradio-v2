@@ -4,13 +4,17 @@ const Promise = require("bluebird");
 const moment = require("moment");
 const _ = require("lodash");
 const schedule = require("node-schedule");
+const colors = require("colors")
 
 const log = debug("player:playlist");
 global.Promise = Promise;
 
 module.exports = function(Playlist) {
   let scheduleNext;
-  Playlist.currentTrack = null;
+  Playlist.info = {
+    status: 'Stop',
+    current: null
+  };
 
   Playlist.getCurrentTrack = function(cb) {
     let Player = Playlist.app.models.Player;
@@ -313,7 +317,7 @@ module.exports = function(Playlist) {
   Playlist.prototype.play = function(cb) {
     let Player = Playlist.app.models.Player;
     let index = this.index;
-
+ 
     Player.playPromised(index)
       .then(() => {
         Playlist.emit("playing", this);
@@ -368,10 +372,14 @@ module.exports = function(Playlist) {
   }
 
   Playlist.on("playing", playlistTrack => {
-    log(">>> Playling now", playlistTrack);
-    log(">>> Next track in: ", playlistTrack.endTime);
 
-    Playlist.currentTrack = playlistTrack;
+
+    Playlist.info.current = playlistTrack;
+    Playlist.info.status = 'Playing';
+
+    console.log('>>> Player info:\n'.magenta, JSON.stringify(Playlist.info, null, 2));
+    log(">>> Next track in: ".cyan, playlistTrack.endTime);
+
     playlistTrack.track((err, track) => {
       if (err) return console.error(err);
       Playlist.app.io.emit("track", track);

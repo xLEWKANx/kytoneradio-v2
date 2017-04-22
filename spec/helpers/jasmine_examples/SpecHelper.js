@@ -5,10 +5,11 @@ const EventEmitter = require('events');
 
 
 beforeAll((next) => {
-  console.log('before all');
   let Player = app.models.Player
   let Playlist = app.models.Playlist
   let Track = app.models.Track
+
+  app.io = new EventEmitter;
 
   let db = app.loopback.createDataSource('db', { connector: 'memory' })
 
@@ -28,7 +29,7 @@ beforeAll((next) => {
 
   class Client extends EventEmitter {
     sendCommand(args, cb) {
-      return cb(null, true);
+      return cb(null, null);
     }
   }
 

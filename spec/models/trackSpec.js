@@ -39,25 +39,6 @@ describe('Track test', () => {
     return moment(Date.parse(date)).format("YYYY-MM-DD HH-mm")
   }
 
-  it('should properly add seconds to Date', () => {
-    let startTime = moment("12-00", "HH-mm").toDate()
-    let endTime = Playlist.addSecond(startTime, 30 * 60)
-    expect(moment(endTime).format("HH-mm")).toBe("12-30")
-  })
-
-  beforeEach((done) => {
-    jasmine.clock().install();
-    Playlist.destroyAll({}).then(done)
-  })
-  it('should add listener to next track', () => {
-    let playlist = Playlist.createFakeTracks(5, () => {
-      playlist[0].play()
-      jasmine.clock().tick(playlist[0].endTime);
-    });
-  })
-
-  afterEach(() => {
-    jasmine.clock().uninstall();
-  })
+ 
 
 })

@@ -149,8 +149,8 @@ module.exports = function(Player) {
   Player.getStatus = function(cb) {
     client.sendCommand(mpd.cmd("status", []), (err, msg) => {
       if (err) return cb(err);
-      msg = mpd.parseKeyValueMessage(msg);
-      return cb(null, msg);
+      if (msg) msg = mpd.parseKeyValueMessage(msg);
+      return cb(null, msg || {});
     });
   };
 
@@ -174,7 +174,7 @@ module.exports = function(Player) {
   Player.nextTrackIndex = function(cb) {
     Player.getStatus((err, status) => {
       if (err) return cb(err);
-      if (!status.nextsong) cb("Player.nextTrackIndex | no next song");
+      // if (status.nextsong) cb("Player.nextTrackIndex | no next song");
       return cb(null, status.nextsong);
     });
   };

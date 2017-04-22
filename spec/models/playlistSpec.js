@@ -20,4 +20,8 @@ describe('Playlist test', () => {
 
   let firstTrack, secondTrack, thirdTrack
 
+   it('privet', () => {
+    expect('privet').toBe('privet')
+  })
+
 })

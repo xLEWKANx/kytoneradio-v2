@@ -15,9 +15,9 @@ import uglify from 'gulp-uglify'
 const debugEnabled = process.env.DEBUG_API
 const apiUrl = process.env.NODE_ENV === 'dev' ? 'http://0.0.0.0:3027/api' : null;
 console.log('API URL', apiUrl);
-const babelNode = './node_modules/.bin/babel-node'
-const exec = debugEnabled ? `${babelNode} --debug` : `${babelNode}`
-console.log('debugEnabled', debugEnabled)
+
+const exec = debugEnabled ? `$node--debug` : `node`
+
 // ESLint configuration
 gulp.task('lint', () => gulp
   .src([

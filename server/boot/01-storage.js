@@ -9,13 +9,7 @@ const log = debug('boot:player')
 const STORAGE_PATH = process.env.STORAGE_PATH || path.resolve('../storage')
 
 module.exports = function (app) {
-
-  // const ds = app.loopback.createDataSource({
-  //   connector: require('loopback-component-storage'),
-  //   provider: 'filesystem',
-  //   root: path.join(__dirname, '../', '../', 'storage'),
-  // })
-  // const container = ds.createModel('container')
+  if (process.env.ENV === 'codegen') return
 
   app.set('STORAGE_PATH', STORAGE_PATH)
 
@@ -29,11 +23,5 @@ module.exports = function (app) {
       console.log(`autoupdate ${err}, ${result}`)
     });
   });
-
-  app.models.Track.scanDir((err, result) => {
-    if (err) return console.log(err)
-    log('scanned at boot ', result.length)
-  })
-  // app.model(container)
 
 }

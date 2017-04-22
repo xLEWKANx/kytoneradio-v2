@@ -1,11 +1,9 @@
 "use strict";
 const mpd = require("mpd");
 const debug = require("debug");
-const Promise = require("bluebird");
+
 const request = require("request");
 const log = debug("player:Player");
-
-global.Promise = Promise;
 
 module.exports = function(Player) {
   let client = {};
@@ -18,7 +16,8 @@ module.exports = function(Player) {
     });
   });
 
-  Player.bootstrap = function(cb) {
+  Player.bootstrap = function (mpd, cb) {
+
     client = mpd.connect({
       port: process.env.MPD_PORT || 6600,
       host: "localhost"
@@ -29,7 +28,7 @@ module.exports = function(Player) {
     });
 
     client.on("ready", () => {
-      console.log("ready");
+      console.log("ready?");
       cb(null, client);
     });
   };
@@ -113,7 +112,8 @@ module.exports = function(Player) {
     }
   });
 
-  Player.clear = function(cb) {
+  Player.clear = function (cb) {
+
     client.sendCommand(mpd.cmd("clear", []), (err, msg) => {
       if (err) return cb(err);
       Player.log(
@@ -198,8 +198,8 @@ module.exports = function(Player) {
       },
       info
     );
-    // Player.create(log, cb)
-    cb && cb();
+    Player.create(log, cb)
+    // cb && cb();
     // cb(null, [])
   };
 

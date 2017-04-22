@@ -1,15 +1,18 @@
 'use strict'
 const debug = require('debug');
 const Promise = require('bluebird');
+const mpd = require("mpd");
 const log = debug('player:boot')
 
 module.exports = function (app, next) {
+  if (process.env.ENV === 'codegen') return next();
   let Player = app.models['Player']
   let Playlist = app.models['Playlist']
   let Counter = app.models['Counter']
 
-  Player.bootstrap((err, msg) => {
-    if (err) next(err)
+  Player.bootstrap(mpd, (err, msg) => {
+    console.log('BOOTSTRAP')
+    if (err) return next(err)
     Player.clearPromised()
       .then(() => {
         return Playlist.findPromised({
@@ -31,7 +34,12 @@ module.exports = function (app, next) {
       .then((tracks) => {
         log('tracks', tracks)
         if (tracks.length) tracks[0].play((err, res) => { console.log(err, res) });
-        next()
+        return app.models.Track.scanDirPromised()
+      })
+      .then((tracks) => {
+  
+        log('scanned at boot ', tracks.length)
+        return next();
       })
       .catch((err) => {
         console.error('Bootstrap mpd error:', err)

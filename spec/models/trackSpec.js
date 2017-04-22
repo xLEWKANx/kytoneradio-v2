@@ -45,14 +45,15 @@ describe('Track test', () => {
     expect(moment(endTime).format("HH-mm")).toBe("12-30")
   })
 
-  beforeEach(() => {
-
+  beforeEach((done) => {
     jasmine.clock().install();
+    Playlist.destroyAll({}).then(done)
   })
   it('should add listener to next track', () => {
-    let playlist = Playlist.createFakeTracks(5);
-    playlist[0].play()
-    jasmine.clock().tick(playlist[0].endTime);
+    let playlist = Playlist.createFakeTracks(5, () => {
+      playlist[0].play()
+      jasmine.clock().tick(playlist[0].endTime);
+    });
   })
 
   afterEach(() => {

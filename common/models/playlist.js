@@ -325,14 +325,17 @@ module.exports = function(Playlist) {
       })
       .catch(cb);
   };
+
   Playlist.prototype.playNext = function(cb) {
     let Player = Playlist.app.models.Player;
-    let triggerNext = this.endTime;
-
+    let { endTime, index } = this;
+    console.log(">>> Next track in: ".cyan, endTime, this);
     if (scheduleNext) scheduleNext.cancel();
 
-    scheduleNext = schedule.scheduleJob(triggerNext, () => {
-      Playlist.nextTrackPromised()
+    scheduleNext = schedule.scheduleJob(endTime, () => {
+      Playlist.findOne({
+        where: { index: index + 1 }
+      })
         .then(track => {
           log("play next track", track);
           if (!track) {
@@ -373,12 +376,11 @@ module.exports = function(Playlist) {
 
   Playlist.on("playing", playlistTrack => {
 
-
     Playlist.info.current = playlistTrack;
     Playlist.info.status = 'Playing';
 
     console.log('>>> Player info:\n'.magenta, JSON.stringify(Playlist.info, null, 2));
-    log(">>> Next track in: ".cyan, playlistTrack.endTime);
+    playlistTrack.playNext();
 
     playlistTrack.track((err, track) => {
       if (err) return console.error(err);
@@ -389,7 +391,6 @@ module.exports = function(Playlist) {
       Playlist.app.io.emit("playlist", tracks);
     });
 
-    playlistTrack.playNext();
   });
 
   Promise.promisifyAll(Playlist, { suffix: "Promised" });

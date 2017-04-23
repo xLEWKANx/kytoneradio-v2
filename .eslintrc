@@ -1,9 +1,9 @@
 {
   "plugins": [
-    "eslint-plugin-jasmine"
+    "eslint-plugin-mocha"
   ],
   "extends": [
-    "plugin:jasmine/recommended"
+    "plugin:mocha/recommended"
   ],
   "env": {
     "es6": true,

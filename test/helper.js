@@ -1,10 +1,12 @@
 /* eslint-env jasmine, node */
 
-const app = require('../../../server/server')
 const EventEmitter = require('events');
+const Promise = require('bluebird');
 
+global.Promise = Promise;
 
-beforeAll((next) => {
+before((next) => {
+  const app = require('../server/server')
   let Player = app.models.Player
   let Playlist = app.models.Playlist
   let Track = app.models.Track

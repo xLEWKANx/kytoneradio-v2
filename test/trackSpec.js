@@ -4,7 +4,7 @@ describe('Track test', () => {
 
   let Promise = require('bluebird')
   let moment = require('moment')
-  let app = require('../../server/server')
+  let app = require('../server/server')
   let Playlist = app.models.Playlist
   let Track = app.models.Track
 

@@ -95,7 +95,7 @@ module.exports = function(Playlist) {
 
   Playlist.createFakeTracks = function (count, tracks = [], cb) {
     let Track = Playlist.app.models.Track;
-    const TRACK_DURATION = 30 * 60;
+    const TRACK_DURATION = 10;
 
     let playlist = [];
     let startTime = new Date();
@@ -114,9 +114,10 @@ module.exports = function(Playlist) {
 
     MOCK_TRACK.playlist.create(MOCK_PLAYLIST_TRACK, (err, track) => {
       if (err) return cb(err);
+      tracks = tracks.concat(track)
       if (count === 0) return cb(null, tracks);
 
-      return Playlist.createFakeTracks(count - 1, tracks.concat(track), cb);
+      return Playlist.createFakeTracks(count - 1, tracks, cb);
     })
   };
 
@@ -333,9 +334,11 @@ module.exports = function(Playlist) {
     if (scheduleNext) scheduleNext.cancel();
 
     scheduleNext = schedule.scheduleJob(endTime, () => {
-      Playlist.findOne({
-        where: { index: index + 1 }
-      })
+
+      this.moveToEndPromised()
+        .then(() => Playlist.findOne({
+          where: { index: index + 1 }
+        }))
         .then(track => {
           log("play next track", track);
           if (!track) {
@@ -343,13 +346,23 @@ module.exports = function(Playlist) {
             return Player.stopPromised();
           } else {
             Playlist.emit("playing", track);
-            // return this.destroyPromised()
           }
         })
         .catch(err => Playlist.emit("error", err));
     });
 
     if (cb) return cb(null, "success");
+  };
+
+  Playlist.prototype.moveToEnd = function (cb) {
+    return this
+      .setIndexPromised()
+      .then(track => {
+        return track.setTimeFromPrevPromised();
+      })
+      .then((track) => track.save())
+      .then((track) => cb(null, track))
+      .catch((err) => { console.log('error', err); cb(err) });
   };
 
   Playlist.observe("before save", (ctx, next) => {

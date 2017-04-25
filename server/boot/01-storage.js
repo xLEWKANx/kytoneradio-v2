@@ -6,7 +6,7 @@ const debug = require('debug')
 const log = debug('boot:player')
 
 
-const STORAGE_PATH = process.env.STORAGE_PATH || path.resolve('../storage')
+const STORAGE_PATH = process.env.STORAGE_PATH || path.resolve('./storage')
 
 module.exports = function (app) {
   if (process.env.ENV === 'codegen') return

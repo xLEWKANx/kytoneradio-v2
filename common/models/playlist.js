@@ -191,10 +191,35 @@ module.exports = function(Playlist) {
       .catch(cb);
   };
 
+
   Playlist.remoteMethod("play", {
     returns: {
       arg: "track",
       type: "object"
+    }
+  });
+
+  Playlist.updateTime = function (cb) {
+
+    Playlist.find({
+        order: "index ASC"
+      })
+      .then(tracks => {
+        log("update time | tracks", tracks);
+        let playing = tracks[0];
+        return Playlist.updateTimeAndIndexPromised(tracks.slice(1), {
+          startTime: playing.endTime,
+          index: playing.index + 1
+        });
+      })
+      .then(tracks => cb(null, tracks))
+      .catch(cb);
+  }
+
+  Playlist.remoteMethod("updateTime", {
+    returns: {
+      arg: "tracks",
+      type: "array"
     }
   });
 

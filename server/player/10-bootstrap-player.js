@@ -29,7 +29,7 @@ module.exports = function (app, next) {
         return Promise.all(promises).then(() => tracks)
       })
       .then((tracks) => {
-        return Playlist.updateTimeAndIndexPromised(tracks, { startTime: new Date })
+        return Playlist.updateTimeAndIndexPromised(tracks, { startTime: new Date, index: 1 })
       })
       .then((tracks) => {
         log('tracks', tracks)

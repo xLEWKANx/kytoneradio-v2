@@ -37,7 +37,13 @@ function TracksCtrl(
 
   this.scanDir = function() {
     Track.scanDir()
-      .$promise.then(() => Track.find({}).$promise)
+      .$promise.then(() => Track.find({
+        filter: {
+          where: {
+            proccessed: true
+          }
+        }
+      }).$promise)
       .then(tracks => this.tracks = tracks);
   };
 
@@ -127,6 +133,9 @@ function TracksCtrl(
   };
   this.stop = function() {
     Playlist.stop();
+  };
+  this.refresh = function() {
+    Playlist.updateTime();
   };
 
   this.clearPlaylist = function() {

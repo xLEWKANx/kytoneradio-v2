@@ -30,6 +30,13 @@ describe("Playlist test", () => {
     Playlist.destroyAll({}, done);
   });
 
+  beforeEach(done => {
+    Playlist.createFakeTracks(4, undefined, (err, tracks) => {
+      playlist = tracks;
+      done()
+    })
+  })
+
   it("it should calculate playlist time from prev", done => {
     Playlist.createFakeTracks(4, undefined, (err, tracks) => {
       expect(err).to.be.equal(null);
@@ -80,6 +87,24 @@ describe("Playlist test", () => {
     })
   });
 
-  afterEach(() => { if (clock) clock.restore() })
+  it("should calculate time after delete tracks", (done) => {
+    playlist[3].destroy()
+      .then(() => {
+        return Playlist.find({})
+      })
+      .then((tracks) => {
+        console.log('after delete', tracks);
+        return Playlist.updateTimePromised();
+      })
+      .then((tracks) => {
+        console.log('after update', tracks);
+        done()
+      })
+  });
+
+  afterEach((done) => {
+    if (clock) clock.restore()
+    Playlist.destroyAll(done)
+  })
 
 });

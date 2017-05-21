@@ -1,14 +1,14 @@
 {
   "db": {
-    "url": "mongodb://localhost:27017/kytone",
-    "name": "db",
-    "connector": "mongodb"
+    "url": "mongodb://admin:radio@ds017256.mlab.com:17256/kytone",
+    "connector": "mongodb",
+    "name": "db"
   },
   "storage": {
     "name": "trackStorage",
     "provider": "filesystem",
     "connector": "loopback-component-storage",
-    "root": "~/storage",
+    "root": "./storage",
     "maxFileSize": "524288000"
   }
 }

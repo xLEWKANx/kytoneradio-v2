@@ -1,7 +1,9 @@
 {
   "name": "Slide",
   "plural": "slides",
-  "base": "AppModel",
+  "mixins": {
+    "AorMixin": {}
+  },
   "properties": {
     "pictureUrl": {
       "type": "string",
@@ -15,11 +17,11 @@
     },
     "innerIndex": {
       "type": "number",
-      "required": "true"
+      "required": true
     },
     "outerIndex": {
       "type": "number",
-      "required": "true"
+      "required": true
     },
     "local": {
       "type": "boolean"
@@ -31,5 +33,28 @@
   "validations": [],
   "relations": {},
   "acls": [],
-  "methods": {}
+  "methods": {
+    "createFakeData": {
+      "accepts": [
+        {
+          "arg": "count",
+          "type": "number",
+          "required": true,
+          "description": "",
+          "http": {
+            "source": "query"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "slides",
+          "type": "array",
+          "root": true,
+          "description": ""
+        }
+      ],
+      "description": "Create fake data"
+    }
+  }
 }

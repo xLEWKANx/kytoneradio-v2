@@ -1,33 +1,7 @@
 {
-  "plugins": [
-    "eslint-plugin-mocha"
-  ],
-  "extends": [
-    "plugin:mocha/recommended"
-  ],
-  "env": {
-    "es6": true,
-    "node": true,
-    "browser": true,
-    "jasmine": true
-  },
+  "extends": ["loopback", "react-app"],
   "rules": {
-    "space-before-function-paren": 0,
-    "comma-dangle": [
-      "error",
-      "only-multiline"
-    ],
-    "no-var": 1,
-    "padded-blocks": 0,
-    "prefer-arrow-callback": [
-      "error",
-      {
-        "allowNamedFunctions": true
-      }
-    ],
-    "prefer-template": 1
-  },
-  "parserOptions": {
-      "sourceType": "module"
+    "object-curly-spacing": ["warn", "always"],
+    "comma-dangle": ["error", "only-multiline"]
   }
 }

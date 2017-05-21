@@ -1,11 +1,11 @@
-"use strict";
-const Promise = require("bluebird");
-const _ = require("underscore");
-const mm = require("musicmetadata");
-const fs = require("fs");
-const debug = require("debug");
+const Promise = require('bluebird');
+const _ = require('underscore');
+const mm = require('musicmetadata');
+const fs = require('fs');
+const path = require('path');
+const debug = require('debug');
 
-const log = debug("player:Track");
+const log = debug('player:Track');
 const MUSIC_EXTENTION_REGEXP = /.mp3$/;
 
 module.exports = function(Track) {
@@ -20,23 +20,23 @@ module.exports = function(Track) {
 
   Track.prototype.getMeta = function(cb) {
     let readStream = fs.createReadStream(this.path);
-    log("getting meta for", this);
+    log('getting meta for', this);
     mm(readStream, { duration: true }, (err, meta) => {
       let artist = meta.artist[0] || null;
       let title = meta.title || null;
-      let songtitle = "";
-      if (artist && title) songtitle += artist + " - " + title;
+      let songtitle = '';
+      if (artist && title) songtitle += artist + ' - ' + title;
       else songtitle = this.title;
-      let info = err
-        ? {
-            err: err.toString(),
-            processed: false
-          }
-        : {
-            duration: meta.duration,
-            title: songtitle,
-            processed: true
-          };
+      let info = err ?
+      {
+        err: err.toString(),
+        processed: false
+      } :
+      {
+        duration: meta.duration,
+        title: songtitle,
+        processed: true
+      };
       Object.assign(this, info);
       log(`Track | Added meta to ${this.name}`);
       readStream.close();
@@ -46,13 +46,13 @@ module.exports = function(Track) {
     });
   };
 
-  Track.remoteMethod("getMeta", {
+  Track.remoteMethod('getMeta', {
     isStatic: false
   });
 
-  Track.observe("before save", (ctx, next) => {
+  Track.observe('before save', (ctx, next) => {
     if (ctx.options.skip) return next();
-    log("before save | ctx", _.keys(ctx));
+    log('before save | ctx', _.keys(ctx));
 
     if (ctx.instance && !ctx.instance.processed) {
       ctx.instance.getMeta(next);
@@ -61,19 +61,19 @@ module.exports = function(Track) {
     }
   });
 
-  Track.afterRemote("deleteById", (ctx, instance, next) => {
+  Track.afterRemote('deleteById', (ctx, instance, next) => {
     if (ctx.options.skip) return next();
-    log("after remote | ctx", _.keys(ctx));
+    log('after remote | ctx', _.keys(ctx));
     let Storage = Track.app.models.musicStorage;
     let id = ctx.args.id;
 
     Track.findById(id, {
-      include: ["playlist"]
+      include: ['playlist']
     })
       .then(track => {
         let length;
         if (track.playlist()) {
-          length = track.playlist().length
+          length = track.playlist().length;
         } else {
           return next();
         }
@@ -81,31 +81,25 @@ module.exports = function(Track) {
           return Promise.reject(
             next(new Error(`${length} tracks in playlist, delete first`))
           );
-        else
-          return track;
+        else return track;
       })
       .then(track => {
-        return Storage.removeFilePromised("music", track.name);
+        return Storage.removeFilePromised('music', track.name);
       })
       .then(next)
       .catch(err => {
-        console.error("delete error", err);
+        console.error('delete error', err);
       });
-    console.log("ctx.where", instance, ctx.args, ctx.methodString);
+    console.log('ctx.where', instance, ctx.args, ctx.methodString);
   });
 
-  function deleteRelatedPlaylists(playlist) {
-    return playlist.destroyPromised();
-  }
-
   Track.scanDir = function(cb) {
-    let db = Track.app.dataSources.db;
     let app = Track.app;
     let musicStorage = app.models.musicStorage;
     let Player = app.models.Player;
 
     musicStorage
-      .getFilesPromised("music")
+      .getFilesPromised('music')
       .filter(filterOnlyMusic)
       .then(files => {
         let filenames = files.map(file => file.name);
@@ -118,6 +112,7 @@ module.exports = function(Track) {
             processed: true
           }
         }).then(processed => {
+          log('processed', processed);
           let filtered = filterProcessed(processed, files);
           return filtered;
         });
@@ -136,11 +131,11 @@ module.exports = function(Track) {
       .catch(err => cb(err));
 
     function fileToTrack(file) {
-      let trackPath = `${app.get("STORAGE_PATH")}/music/${file.name}`;
+      let trackPath = `${app.get('storagePath')}/music/${file.name}`;
 
       return {
         name: file.name,
-        title: file.name.replace(MUSIC_EXTENTION_REGEXP, ""),
+        title: file.name.replace(MUSIC_EXTENTION_REGEXP, ''),
         path: trackPath,
         container: file.container,
         processed: false
@@ -161,34 +156,21 @@ module.exports = function(Track) {
     }
   };
 
-  Track.remoteMethod("scanDir", {
-    isStatic: true,
-    returns: { arg: "body", type: "array", root: true }
-  });
-
   Track.prototype.addToPlaylist = function(cb) {
     let Player = Track.app.models.Player;
 
-    if (typeof position === "function") {
-      cb = position;
-      position = null;
-    }
-    this.playlist.create({
+    this.playlist
+      .create({
         name: this.name,
         duration: this.duration
       })
       .then(log => {
-        return Player.addTrackPromised(this.name)
+        return Player.addTrackPromised(this.name);
       })
       .then(track => cb(null, track))
       .catch(cb);
   };
 
-  Track.remoteMethod("addToPlaylist", {
-    isStatic: false,
-    returns: { arg: "playlist", type: "object", root: true }
-  });
-
-  Promise.promisifyAll(Track, { suffix: "Promised" });
-  Promise.promisifyAll(Track.prototype, { suffix: "Promised" });
+  Promise.promisifyAll(Track, { suffix: 'Promised' });
+  Promise.promisifyAll(Track.prototype, { suffix: 'Promised' });
 };

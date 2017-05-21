@@ -1,6 +1,5 @@
 {
   "name": "Track",
-  "plural": "tracks",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
@@ -31,6 +30,9 @@
     },
     "processed": {
       "type": "boolean"
+    },
+    "error": {
+      "type": "object"
     }
   },
   "validations": [],
@@ -42,5 +44,20 @@
     }
   },
   "acls": [],
-  "methods": {}
+  "methods": {
+    "prototype.addToPlaylist": {
+      "returns": {
+        "arg": "playlist",
+        "type": "object",
+        "root": true
+      }
+    },
+    "scanDir": {
+      "returns": {
+        "arg": "body",
+        "type": "array",
+        "root": true
+      }
+    }
+  }
 }

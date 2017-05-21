@@ -1,4 +1,5 @@
-'use strict'
+const Promise = require('bluebird');
 
-module.exports = function(MusicStorage) {
-}
+module.exports = function(Model) {
+  Promise.promisifyAll(Model, { suffix: 'Promised' });
+};

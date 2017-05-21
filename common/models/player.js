@@ -1,96 +1,96 @@
-"use strict";
-const mpd = require("mpd");
-const debug = require("debug");
+const mpd = require('mpd');
+const debug = require('debug');
 
-const request = require("request");
-const log = debug("player:Player");
+const request = require('request');
+const log = debug('player:Player');
 
 module.exports = function(Player) {
   let client = {};
   let state = {
     isPlaying: false
   };
-  Player.on("error", err => {
+  Player.on('error', err => {
     Player.log({
       error: err
     });
   });
 
-  Player.bootstrap = function (mpd, cb) {
-
+  Player.bootstrap = function(mpd, cb) {
     client = mpd.connect({
       port: process.env.MPD_PORT || 6600,
-      host: "localhost"
+      host: 'localhost'
     });
-    client.on("error", err => {
+    client.on('error', err => {
       cb(err);
-      Player.emit("error", err);
+      console.error('Player | boostrap error:', err);
+      Player.emit('error', err);
     });
 
-    client.on("ready", () => {
-      console.log("ready?");
+    client.on('ready', () => {
+      console.log('ready?');
       cb(null, client);
     });
   };
 
   Player.play = function(index, cb) {
-    if (typeof index === "function") {
+    if (typeof index === 'function') {
       cb = index;
       index = undefined;
     }
     let arg = index === undefined ? [] : [index];
-    client.sendCommand(mpd.cmd("play", arg), (err, msg) => {
+    client.sendCommand(mpd.cmd('play', arg), (err, msg) => {
       if (err) return cb(err);
-      Player.emit("play");
+      Player.emit('play');
       state.isPlaying = true;
       Player.log(
         {
-          command: "play"
+          command: 'play'
         },
         cb
       );
     });
   };
 
-  Player.remoteMethod("play", {
+  Player.remoteMethod('play', {
     accepts: {
-      arg: "index",
-      type: "number"
+      arg: 'index',
+      type: 'number'
     },
     returns: {
-      arg: "message",
-      type: "string"
+      arg: 'message',
+      type: 'string'
     }
   });
 
   Player.stop = function(cb) {
-    client.sendCommand(mpd.cmd("stop", []), (err, msg) => {
+    client.sendCommand(mpd.cmd('stop', []), (err, msg) => {
       if (err) return cb(err);
-      Player.emit("stop");
+      Player.emit('stop');
       state.isPlaying = false;
       Player.log(
         {
-          command: "stop"
+          command: 'stop'
         },
         cb
       );
     });
   };
 
-  Player.remoteMethod("stop", {
+  Player.remoteMethod('stop', {
     returns: {
-      arg: "message",
-      type: "string"
+      arg: 'message',
+      type: 'string'
     }
   });
 
   Player.addTrack = function(name, cb) {
-    client.sendCommand(mpd.cmd("add", [name]), (err, msg) => {
+    console.log('add track', name);
+    client.sendCommand(mpd.cmd('add', [name]), (err, msg) => {
       if (err) return cb(err);
       log(`Added ${name} to MPD playlist`, err, msg);
       Player.log(
         {
-          command: "play",
+          command: 'play',
           messange: name
         },
         cb
@@ -99,68 +99,67 @@ module.exports = function(Player) {
   };
 
   Player.getCurrentPlaylist = function(cb) {
-    client.sendCommand(mpd.cmd("playlistinfo", []), (err, msg) => {
+    client.sendCommand(mpd.cmd('playlistinfo', []), (err, msg) => {
       if (err) return cb(err);
       return cb(null, msg);
     });
   };
 
-  Player.remoteMethod("getCurrentPlaylist", {
+  Player.remoteMethod('getCurrentPlaylist', {
     returns: {
-      arg: "tracks",
-      type: "string"
+      arg: 'tracks',
+      type: 'string'
     }
   });
 
-  Player.clear = function (cb) {
-
-    client.sendCommand(mpd.cmd("clear", []), (err, msg) => {
+  Player.clear = function(cb) {
+    client.sendCommand(mpd.cmd('clear', []), (err, msg) => {
       if (err) return cb(err);
       Player.log(
         {
-          command: "clear"
+          command: 'clear'
         },
         cb
       );
     });
   };
 
-  Player.remoteMethod("clear", {
+  Player.remoteMethod('clear', {
     returns: {
-      arg: "message",
-      type: "string"
+      arg: 'message',
+      type: 'string'
     }
   });
 
   Player.deleteTrack = function(position, cb) {
-    client.sendCommand(mpd.cmd("delete", [position]), (err, msg) => {
+    client.sendCommand(mpd.cmd('delete', [position]), (err, msg) => {
       if (err) return cb(err);
       return cb(null, msg);
     });
   };
 
   Player.moveTrack = function(require, to, cb) {
-    client.sendCommand(mpd.cmd("move", [require, to]), (err, msg) => {
+    client.sendCommand(mpd.cmd('move', [require, to]), (err, msg) => {
       if (err) return cb(err);
       return cb(null, msg);
     });
   };
 
   Player.getStatus = function(cb) {
-    client.sendCommand(mpd.cmd("status", []), (err, msg) => {
+    client.sendCommand(mpd.cmd('status', []), (err, msg) => {
       if (err) return cb(err);
       if (msg) msg = mpd.parseKeyValueMessage(msg);
       return cb(null, msg || {});
     });
   };
 
-  Player.remoteMethod("getStatus", {
+  Player.remoteMethod('getStatus', {
     http: {
-      verb: "get"
+      verb: 'get'
     },
     returns: {
-      arg: "status",
-      type: "string"
+      arg: 'status',
+      type: 'string'
     }
   });
 
@@ -180,9 +179,9 @@ module.exports = function(Player) {
   };
 
   Player.updateDatabase = function(cb) {
-    client.sendCommand(mpd.cmd("update", []), (err, msg) => {
+    client.sendCommand(mpd.cmd('update', []), (err, msg) => {
       if (err) return cb(err);
-      log("database updated", msg);
+      log('database updated', msg);
       return cb(null, msg);
     });
   };
@@ -198,25 +197,25 @@ module.exports = function(Player) {
       },
       info
     );
-    Player.create(log, cb)
+    Player.create(log, cb);
     // cb && cb();
     // cb(null, [])
   };
 
   Player.stream = function(cb) {
-    let stream = request("http://localhost:15001/stream");
-    cb(null, stream, "application/octet-stream");
+    let stream = request('http://localhost:15001/stream');
+    cb(null, stream, 'application/octet-stream');
   };
 
-  Player.remoteMethod("stream", {
+  Player.remoteMethod('stream', {
     http: {
-      verb: "get"
+      verb: 'get'
     },
     returns: [
-      { arg: "body", type: "file", root: true },
-      { arg: "Content-Type", type: "string", http: { target: "header" } }
+      { arg: 'body', type: 'file', root: true },
+      { arg: 'Content-Type', type: 'string', http: { target: 'header' } }
     ]
   });
 
-  Promise.promisifyAll(Player, { suffix: "Promised" });
+  Promise.promisifyAll(Player, { suffix: 'Promised' });
 };

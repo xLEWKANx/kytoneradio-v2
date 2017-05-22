@@ -61,16 +61,16 @@ module.exports = function(Track) {
     }
   });
 
-  Track.afterRemote('deleteById', (ctx, instance, next) => {
+  Track.beforeRemote('deleteById', (ctx, instance, next) => {
     if (ctx.options.skip) return next();
     log('after remote | ctx', _.keys(ctx));
     let Storage = Track.app.models.musicStorage;
     let id = ctx.args.id;
-
     Track.findById(id, {
       include: ['playlist']
     })
       .then(track => {
+        log('track to delete', track);
         let length;
         if (track.playlist()) {
           length = track.playlist().length;
@@ -86,11 +86,8 @@ module.exports = function(Track) {
       .then(track => {
         return Storage.removeFilePromised('music', track.name);
       })
-      .then(next)
-      .catch(err => {
-        console.error('delete error', err);
-      });
-    console.log('ctx.where', instance, ctx.args, ctx.methodString);
+      .then(() => next())
+      .catch(next);
   });
 
   Track.scanDir = function(cb) {

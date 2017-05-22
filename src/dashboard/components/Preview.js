@@ -10,7 +10,7 @@ import {
 } from 'material-ui';
 import { connect } from 'react-redux';
 import ReactMarkdown from 'react-markdown';
-import previewImg from './img/preview.png';
+import previewImg from '../img/preview.png';
 import 'flexboxgrid/css/flexboxgrid.css';
 
 const PreviewContent = ({ outerIndex, innerIndex, pictureUrl, content }) => (

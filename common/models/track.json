@@ -1,7 +1,11 @@
 {
   "name": "Track",
+  "plural": "tracks",
   "base": "PersistedModel",
   "idInjection": true,
+  "mixins": {
+    "AorMixin": {}
+  },
   "options": {
     "validateUpsert": true
   },

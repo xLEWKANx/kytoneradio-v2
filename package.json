@@ -16,7 +16,7 @@
     "react-scripts": "^0.9.5"
   },
   "dependencies": {
-    "admin-on-rest": "^1.0.0",
+    "admin-on-rest": "^1.0.2",
     "aor-loopback": "^1.2.2",
     "compression": "^1.0.3",
     "cors": "^2.5.2",

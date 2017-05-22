@@ -52,9 +52,9 @@ addressparser@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/addressparser/-/addressparser-1.0.1.tgz#47afbe1a2a9262191db6838e4fd1d39b40821746"
 
-admin-on-rest@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/admin-on-rest/-/admin-on-rest-1.0.0.tgz#b8a4ee8d6c85fa74d8d9374b6e3afff9f7978a97"
+admin-on-rest@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/admin-on-rest/-/admin-on-rest-1.0.2.tgz#bc02126c33ef8347e7ad783521056d9f9edc4fc9"
   dependencies:
     babel-runtime "~6.18.0"
     inflection "~1.12.0"

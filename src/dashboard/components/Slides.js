@@ -18,7 +18,7 @@ import {
   Filter,
   Create
 } from 'admin-on-rest';
-import ConditionalField from './aor-components/fields/ConditionalField';
+import ConditionalField from '../aor-components/fields/ConditionalField';
 import { CardActions } from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import NavigationRefresh from 'material-ui/svg-icons/navigation/refresh';

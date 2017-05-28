@@ -2,11 +2,13 @@ import React from 'react';
 import { Admin, Resource, Delete } from 'admin-on-rest';
 import loopbackRestClient from 'aor-loopback';
 
+import reducers from '../reducer';
 import { SlideList, SlideEdit, SlideCreate } from './Slides';
 import { TrackList, TrackEdit } from './Tracks';
 
 const App = () => (
   <Admin
+    customReducers={{ reducers }}
     restClient={loopbackRestClient('http://localhost:3027/api', undefined, {
       filterTransform: ({ title, ...rest }) => (title ? {
         title: {

@@ -2,7 +2,6 @@ import React from 'react';
 import {
   List,
   Datagrid,
-  FunctionField,
   ImageField,
   BooleanField,
   TextField,

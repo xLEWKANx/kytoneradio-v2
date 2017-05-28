@@ -26,6 +26,7 @@ import { ListButton, DeleteButton } from 'admin-on-rest';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
+import Uploader from './Uploader';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 
 const TrackFilter = props => (
@@ -35,19 +36,22 @@ const TrackFilter = props => (
 );
 
 export const TrackList = props => (
-  <List {...props} filters={<TrackFilter />}>
-    <Datagrid>
-      <FunctionField
-        label="Time"
-        render={record =>
-          moment.utc(0).seconds(record.duration).format('HH:mm:ss')}
-      />
-      <BooleanField source="processed" label="Processed" />
-      <TextField source="title" label="Track" />
-      <EditButton />
-      <DeleteButton />
-    </Datagrid>
-  </List>
+  <div>
+    <Uploader />
+    <List {...props} filters={<TrackFilter />}>
+      <Datagrid>
+        <FunctionField
+          label="Time"
+          render={record =>
+            moment.utc(0).seconds(record.duration).format('HH:mm:ss')}
+        />
+        <BooleanField source="processed" label="Processed" />
+        <TextField source="title" label="Track" />
+        <EditButton />
+        <DeleteButton />
+      </Datagrid>
+    </List>
+  </div>
 );
 
 function mapStateToProps(state, props) {

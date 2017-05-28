@@ -44,7 +44,7 @@
   },
   "Playlist": {
     "dataSource": "db",
-    "public": true
+    "public": false
   },
   "Slide": {
     "dataSource": "db",
@@ -56,6 +56,6 @@
   },
   "musicStorage": {
     "dataSource": "storage",
-    "public": true
+    "public": false
   }
 }

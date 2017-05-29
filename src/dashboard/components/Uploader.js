@@ -80,6 +80,10 @@ class Uploader extends Component {
           uploadedFiles: prev.uploadedFiles + 1
         }));
       });
+    }).then(() => {
+      dispatch(uploadActions.uploadSuccess());
+    }).catch((err) => {
+      dispatch(uploadActions.uploadFail(err));
     });
   }
 

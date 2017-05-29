@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import pure from 'recompose/pure';
-import { TextField } from 'admin-on-rest';
 
 /**
  * @example

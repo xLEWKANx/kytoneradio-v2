@@ -26,8 +26,53 @@ import { ListButton, DeleteButton } from 'admin-on-rest';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
+import { fetchJson } from 'aor-loopback';
+
 import Uploader from './Uploader';
-import { Grid, Row, Col } from 'react-flexbox-grid';
+// import { Grid, Row, Col } from 'react-flexbox-grid';
+
+const cardActionStyle = {
+  zIndex: 2,
+  display: 'inline-block',
+  float: 'right'
+};
+
+const PostActions = ({
+  resource,
+  filters,
+  displayedFilters,
+  filterValues,
+  basePath,
+  showFilter,
+  refresh
+}) => (
+  <CardActions style={cardActionStyle}>
+    {filters &&
+      React.cloneElement(filters, {
+        resource,
+        showFilter,
+        displayedFilters,
+        filterValues,
+        context: 'button'
+      })}
+    <FlatButton
+      primary
+      label="refresh"
+      onClick={refresh}
+      icon={<NavigationRefresh />}
+    />
+    <FlatButton
+      primary
+      label="Scan Tracks"
+      onClick={(e) => {
+        fetchJson('http://0.0.0.0:3027/api/tracks/scanDir', { method: 'POST' }).then((res) => {
+          console.log(res);
+          refresh(e);
+        });
+      }}
+    />
+  </CardActions>
+);
 
 const TrackFilter = props => (
   <Filter {...props}>
@@ -38,7 +83,7 @@ const TrackFilter = props => (
 export const TrackList = props => (
   <div>
     <Uploader />
-    <List {...props} filters={<TrackFilter />}>
+    <List {...props} filters={<TrackFilter />} actions={<PostActions />}>
       <Datagrid>
         <FunctionField
           label="Time"

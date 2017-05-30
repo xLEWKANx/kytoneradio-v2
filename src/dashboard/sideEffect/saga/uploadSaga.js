@@ -3,16 +3,17 @@ import { push } from 'react-router-redux';
 import { showNotification, FETCH_START, FETCH_END } from 'admin-on-rest';
 
 function* handleUpload() {
+  yield put(showNotification('Uplooad starting'));
   yield put({ type: FETCH_START });
 }
 
 function* handleUploadEnd() {
+  yield put(showNotification('Tracks uploaded'));
   yield put({ type: FETCH_END });
 }
 
 function* handleUploadError(action) {
-  console.log('error action', action);
-  yield yield put(showNotification('Error: uploading failed', 'warning'));
+  yield put(showNotification('Error: uploading failed', 'warning'));
   yield put({ type: FETCH_END });
 }
 

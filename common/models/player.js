@@ -6,6 +6,7 @@ const log = debug('player:Player');
 
 module.exports = function(Player) {
   let client = {};
+
   let state = {
     isPlaying: false
   };
@@ -40,8 +41,6 @@ module.exports = function(Player) {
     let arg = index === undefined ? [] : [index];
     client.sendCommand(mpd.cmd('play', arg), (err, msg) => {
       if (err) return cb(err);
-      Player.emit('play');
-      state.isPlaying = true;
       Player.log(
         {
           command: 'play'
@@ -186,31 +185,40 @@ module.exports = function(Player) {
     });
   };
 
-  Player.getState = function() {
-    return state;
-  };
-
   Player.log = function(info, cb) {
-    let log = Object.assign(
-      {
-        timestamp: new Date()
-      },
-      info
-    );
-    Player.create(log, cb);
-    // cb && cb();
-    // cb(null, [])
+    Player.getStatus((err, status) => {
+      if (err) return cb(err);
+      let log = Object.assign(
+        {
+          timestamp: new Date(),
+          status
+        },
+        info
+      );
+      return Player.create(log, cb);
+    });
   };
 
-  Player.stream = function(cb) {
-    let stream = request('http://localhost:15001/stream');
-    cb(null, stream, 'application/octet-stream');
+  Player.stream = function(req, res, cb) {
+    let stream = request('http://localhost:15001/stream').on('error', err => {
+      return cb('Stream is no avalible');
+    }).on('response', () => {
+      return cb(null, stream, 'application/octet-stream');
+    });
+
+    req.on('close', () => {
+      stream.abort();
+    });
   };
 
   Player.remoteMethod('stream', {
     http: {
       verb: 'get'
     },
+    accepts: [
+      { arg: 'req', type: 'object', http: { source: 'req' } },
+      { arg: 'req', type: 'object', http: { source: 'res' } }
+    ],
     returns: [
       { arg: 'body', type: 'file', root: true },
       { arg: 'Content-Type', type: 'string', http: { target: 'header' } }

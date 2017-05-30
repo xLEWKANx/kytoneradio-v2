@@ -161,10 +161,10 @@ module.exports = function(Track) {
         name: this.name,
         duration: this.duration
       })
-      .then(log => {
-        return Player.addTrackPromised(this.name);
+      .then(playlistTrack => {
+        return Player.addTrackPromised(this.name).then(() => playlistTrack);
       })
-      .then(track => cb(null, track))
+      .then(playlistTrack => cb(null, playlistTrack))
       .catch(cb);
   };
 

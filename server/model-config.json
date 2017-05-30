@@ -44,7 +44,7 @@
   },
   "Playlist": {
     "dataSource": "db",
-    "public": false
+    "public": true
   },
   "Slide": {
     "dataSource": "db",

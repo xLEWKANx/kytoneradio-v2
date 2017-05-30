@@ -43,11 +43,6 @@
       "type": "belongsTo",
       "model": "Track",
       "foreignKey": "trackId"
-    },
-    "event": {
-      "type": "hasOne",
-      "model": "Event",
-      "foreignKey": ""
     }
   },
   "acls": [],

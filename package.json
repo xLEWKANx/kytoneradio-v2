@@ -7,13 +7,17 @@
     "node": ">=4"
   },
   "devDependencies": {
+    "chai": "^4.0.0",
+    "chai-datetime": "^1.4.1",
     "dotenv": "^4.0.0",
     "enzyme": "^2.8.2",
     "eslint": "^3.17.1",
     "eslint-config-loopback": "^8.0.0",
     "nsp": "^2.1.0",
     "react-addons-test-utils": "^15.5.1",
-    "react-scripts": "0.9.5"
+    "react-scripts": "0.9.5",
+    "sinon": "^2.3.2",
+    "timekeeper": "^1.0.0"
   },
   "dependencies": {
     "admin-on-rest": "^1.0.2",

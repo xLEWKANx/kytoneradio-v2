@@ -1,12 +1,11 @@
-"use strict";
-const debug = require("debug");
-const Promise = require("bluebird");
-const moment = require("moment");
-const _ = require("lodash");
-const schedule = require("node-schedule");
-const colors = require("colors")
+const debug = require('debug');
+const Promise = require('bluebird');
+const moment = require('moment');
+const _ = require('lodash');
+const schedule = require('node-schedule');
+const colors = require('colors');
 
-const log = debug("player:playlist");
+const log = debug('player:playlist');
 global.Promise = Promise;
 
 module.exports = function(Playlist) {
@@ -25,21 +24,21 @@ module.exports = function(Playlist) {
           where: {
             index: index
           },
-          include: ["track"]
+          include: ['track']
         });
       })
       .then(track => cb(null, track))
       .catch(cb);
   };
 
-  Playlist.remoteMethod("now", {
+  Playlist.remoteMethod('now', {
     http: {
-      verb: "get"
+      verb: 'get'
     },
     returns: {
-      arg: "track",
+      arg: 'track',
       root: true,
-      type: "obj"
+      type: 'obj'
     }
   });
 
@@ -54,13 +53,13 @@ module.exports = function(Playlist) {
       .catch(cb);
   };
 
-  Playlist.remoteMethod("nextTrack", {
+  Playlist.remoteMethod('nextTrack', {
     http: {
-      verb: "get"
+      verb: 'get'
     },
     returns: {
-      arg: "track",
-      type: "object"
+      arg: 'track',
+      type: 'object'
     }
   });
 
@@ -75,25 +74,26 @@ module.exports = function(Playlist) {
               gt: index
             }
           },
-          include: ["track"],
+          include: ['track'],
           limit: 5
-        }))
+        })
+      )
       .then(tracks => cb(null, tracks))
       .catch(cb);
   };
 
-  Playlist.remoteMethod("getSchedule", {
+  Playlist.remoteMethod('getSchedule', {
     http: {
-      verb: "get"
+      verb: 'get'
     },
     returns: {
-      arg: "tracks",
+      arg: 'tracks',
       root: true,
-      type: "array"
+      type: 'array'
     }
   });
 
-  Playlist.createFakeTracks = function (count, tracks = [], cb) {
+  Playlist.createFakeTracks = function(count, tracks = [], cb) {
     let Track = Playlist.app.models.Track;
     const TRACK_DURATION = 10;
 
@@ -104,36 +104,36 @@ module.exports = function(Playlist) {
       name: 'test track',
       processed: true,
       duration: TRACK_DURATION
-    })
+    });
 
     let MOCK_PLAYLIST_TRACK = new Playlist({
       name: 'test playlist track',
       duration: TRACK_DURATION,
       index: 0
-    })
+    });
 
     MOCK_TRACK.playlist.create(MOCK_PLAYLIST_TRACK, (err, track) => {
       if (err) return cb(err);
-      tracks = tracks.concat(track)
+      tracks = tracks.concat(track);
       if (count === 0) return cb(null, tracks);
 
       return Playlist.createFakeTracks(count - 1, tracks, cb);
-    })
+    });
   };
 
   Playlist.addSecond = (date, duration) => {
     if (!date) throw new Error(`date is ${date}`);
-    return moment(date).add(duration, "seconds").toDate();
+    return moment(date).add(duration, 'seconds').toDate();
   };
 
-  Playlist.remoteMethod("decIndexFrom", {
+  Playlist.remoteMethod('decIndexFrom', {
     accepts: {
-      arg: "index",
-      type: "number"
+      arg: 'index',
+      type: 'number'
     },
     returns: {
-      arg: "tracks",
-      type: "array"
+      arg: 'tracks',
+      type: 'array'
     }
   });
 
@@ -142,11 +142,11 @@ module.exports = function(Playlist) {
 
     Player.clearPromised()
       .then(() => {
-        log("before destroy");
+        log('before destroy');
         return Playlist.destroyAllPromised({}, { skip: true });
       })
       .then(result => {
-        log("Playlist clear", result);
+        log('Playlist clear', result);
         cb(null, result);
       })
       .catch(err => {
@@ -154,10 +154,10 @@ module.exports = function(Playlist) {
       });
   };
 
-  Playlist.remoteMethod("clear", {
+  Playlist.remoteMethod('clear', {
     returns: {
-      arg: "log",
-      type: "object"
+      arg: 'log',
+      type: 'object'
     }
   });
 
@@ -166,7 +166,7 @@ module.exports = function(Playlist) {
     let Player = Playlist.app.models.Player;
     Player.currentTrackIndexPromised()
       .then(index => {
-        log("static play | index:", index);
+        log('static play | index:', index);
         return Playlist.findPromised({
           where: {
             index: {
@@ -176,7 +176,7 @@ module.exports = function(Playlist) {
         });
       })
       .then(tracks => {
-        log("static play | tracks", tracks);
+        log('static play | tracks', tracks);
         return Playlist.updateTimeAndIndexPromised(tracks, {
           startTime: new Date()
         });
@@ -185,27 +185,25 @@ module.exports = function(Playlist) {
         if (tracks.length) {
           return tracks[0].playPromised().then(track => cb(null, track));
         } else {
-          cb("static play | No tracks to play");
+          cb('static play | No tracks to play');
         }
       })
       .catch(cb);
   };
 
-
-  Playlist.remoteMethod("play", {
+  Playlist.remoteMethod('play', {
     returns: {
-      arg: "track",
-      type: "object"
+      arg: 'track',
+      type: 'object'
     }
   });
 
-  Playlist.updateTime = function (cb) {
-
+  Playlist.updateTime = function(cb) {
     Playlist.find({
-        order: "index ASC"
-      })
+      order: 'index ASC'
+    })
       .then(tracks => {
-        log("update time | tracks", tracks);
+        log('update time | tracks', tracks);
         let playing = tracks[0];
         return Playlist.updateTimeAndIndexPromised(tracks.slice(1), {
           startTime: playing.endTime,
@@ -214,12 +212,12 @@ module.exports = function(Playlist) {
       })
       .then(tracks => cb(null, tracks))
       .catch(cb);
-  }
+  };
 
-  Playlist.remoteMethod("updateTime", {
+  Playlist.remoteMethod('updateTime', {
     returns: {
-      arg: "tracks",
-      type: "array"
+      arg: 'tracks',
+      type: 'array'
     }
   });
 
@@ -233,10 +231,10 @@ module.exports = function(Playlist) {
       .catch(cb);
   };
 
-  Playlist.remoteMethod("stop", {
+  Playlist.remoteMethod('stop', {
     returns: {
-      arg: "track",
-      type: "obj"
+      arg: 'track',
+      type: 'obj'
     }
   });
 
@@ -259,7 +257,7 @@ module.exports = function(Playlist) {
       (err, track) => {
         if (err) return cb(err);
         this.index = track ? track.index + 1 : 0;
-        log("set index", this.index, "for", this.name);
+        log('set index', this.index, 'for', this.name);
         return cb(null, this);
       }
     );
@@ -293,7 +291,7 @@ module.exports = function(Playlist) {
     let startTime = options.startTime;
     if (isFinite(index)) tracks = Playlist.setIndexesForTracks(tracks, index);
     if (startTime) tracks = Playlist.setTimeForTracks(tracks, startTime);
-    log("updateTimeAndIndex | track updated", tracks);
+    log('updateTimeAndIndex | track updated', tracks);
     return Playlist.saveTracks(tracks, cb);
   };
 
@@ -305,7 +303,7 @@ module.exports = function(Playlist) {
   };
 
   Playlist.prototype.setTimeFromPrev = function(cb) {
-    log("set time for", this);
+    log('set time for', this);
     Playlist.findOnePromised({
       where: {
         and: [
@@ -321,18 +319,18 @@ module.exports = function(Playlist) {
           }
         ]
       },
-      order: "index DESC",
-      include: "track"
+      order: 'index DESC',
+      include: 'track'
     })
       .then(lastPlaylistTrack => {
-        log("lastPlaylistTrack", lastPlaylistTrack);
+        log('lastPlaylistTrack', lastPlaylistTrack);
         if (!lastPlaylistTrack || lastPlaylistTrack.endTime < Date.now()) {
           lastPlaylistTrack = {
             endTime: new Date()
           };
         }
         this.setTime(lastPlaylistTrack);
-        log("setTime track:", this);
+        log('setTime track:', this);
         cb(null, this);
       })
       .catch(err => {
@@ -343,10 +341,10 @@ module.exports = function(Playlist) {
   Playlist.prototype.play = function(cb) {
     let Player = Playlist.app.models.Player;
     let index = this.index;
- 
+
     Player.playPromised(index)
       .then(() => {
-        Playlist.emit("playing", this);
+        Playlist.emit('playing', this);
         return cb(null, this);
       })
       .catch(cb);
@@ -355,46 +353,49 @@ module.exports = function(Playlist) {
   Playlist.prototype.playNext = function(cb) {
     let Player = Playlist.app.models.Player;
     let { endTime, index } = this;
-    console.log(">>> Next track in: ".cyan, endTime, this);
+    console.log('>>> Next track in: '.cyan, endTime, this);
     if (scheduleNext) scheduleNext.cancel();
 
     scheduleNext = schedule.scheduleJob(endTime, () => {
-
       this.moveToEndPromised()
-        .then(() => Playlist.findOne({
-          where: { index: index + 1 }
-        }))
+        .then(() =>
+          Playlist.findOne({
+            where: { index: index + 1 }
+          })
+        )
         .then(track => {
-          log("play next track", track);
+          log('play next track', track);
           if (!track) {
-            console.log(">>> !! QUEUE END");
+            console.log('>>> !! QUEUE END');
             return Player.stopPromised();
           } else {
-            Playlist.emit("playing", track);
+            Playlist.emit('playing', track);
           }
         })
-        .catch(err => Playlist.emit("error", err));
+        .catch(err => Playlist.emit('error', err));
     });
 
-    if (cb) return cb(null, "success");
+    if (cb) return cb(null, 'success');
   };
 
-  Playlist.prototype.moveToEnd = function (cb) {
-    return this
-      .setIndexPromised()
+  Playlist.prototype.moveToEnd = function(cb) {
+    return this.setIndexPromised()
       .then(track => {
         return track.setTimeFromPrevPromised();
       })
-      .then((track) => track.save())
-      .then((track) => cb(null, track))
-      .catch((err) => { console.log('error', err); cb(err) });
+      .then(track => track.save())
+      .then(track => cb(null, track))
+      .catch(err => {
+        console.log('error', err);
+        cb(err);
+      });
   };
 
-  Playlist.observe("before save", (ctx, next) => {
+  Playlist.observe('before save', (ctx, next) => {
     if (ctx.options.skip) return next();
-    log("before save | ctx", _.keys(ctx));
+    log('before save | ctx', _.keys(ctx));
     if (ctx.instance && ctx.isNewInstance) {
-      log("instance", ctx.instance);
+      log('instance', ctx.instance);
       return updateTrackInfo(ctx.instance, next);
     } else if (ctx.where && ctx.where.index) {
       next();
@@ -412,25 +413,26 @@ module.exports = function(Playlist) {
       .catch(next);
   }
 
-  Playlist.on("playing", playlistTrack => {
-
+  Playlist.on('playing', playlistTrack => {
     Playlist.info.current = playlistTrack;
     Playlist.info.status = 'Playing';
 
-    console.log('>>> Player info:\n'.magenta, JSON.stringify(Playlist.info, null, 2));
+    console.log(
+      '>>> Player info:\n'.magenta,
+      JSON.stringify(Playlist.info, null, 2)
+    );
     playlistTrack.playNext();
 
     playlistTrack.track((err, track) => {
       if (err) return console.error(err);
-      Playlist.app.io.emit("track", track);
+      Playlist.app.io.emit('track', track);
     });
 
     Playlist.getSchedulePromised().then(tracks => {
-      Playlist.app.io.emit("playlist", tracks);
+      Playlist.app.io.emit('playlist', tracks);
     });
-
   });
 
-  Promise.promisifyAll(Playlist, { suffix: "Promised" });
-  Promise.promisifyAll(Playlist.prototype, { suffix: "Promised" });
+  Promise.promisifyAll(Playlist, { suffix: 'Promised' });
+  Promise.promisifyAll(Playlist.prototype, { suffix: 'Promised' });
 };

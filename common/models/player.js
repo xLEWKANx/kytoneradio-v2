@@ -1,6 +1,7 @@
 const mpd = require('mpd');
 const debug = require('debug');
 
+const createPromiseCallback = require('../../lib/utils').createPromiseCallback;
 const request = require('request');
 const log = debug('player:Player');
 
@@ -145,11 +146,14 @@ module.exports = function(Player) {
   };
 
   Player.getStatus = function(cb) {
+    cb = cb || createPromiseCallback();
     client.sendCommand(mpd.cmd('status', []), (err, msg) => {
       if (err) return cb(err);
       if (msg) msg = mpd.parseKeyValueMessage(msg);
       return cb(null, msg || {});
     });
+
+    return cb.promise;
   };
 
   Player.remoteMethod('getStatus', {
@@ -163,10 +167,14 @@ module.exports = function(Player) {
   });
 
   Player.currentTrackIndex = function(cb) {
+    cb = cb || createPromiseCallback();
+
     Player.getStatus((err, status) => {
       if (err) return cb(err);
       return cb(null, status.song || 0);
     });
+
+    return cb.promise;
   };
 
   Player.nextTrackIndex = function(cb) {

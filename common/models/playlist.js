@@ -4,6 +4,7 @@ const moment = require('moment');
 const _ = require('lodash');
 const schedule = require('node-schedule');
 const colors = require('colors');
+const createPromiseCallback = require('../../lib/utils').createPromiseCallback;
 
 const log = debug('player:playlist');
 global.Promise = Promise;
@@ -62,6 +63,25 @@ module.exports = function(Playlist) {
       type: 'object'
     }
   });
+
+  Playlist.tracksByOrder = function(cb) {
+    cb = cb || createPromiseCallback();
+
+    let Player = Playlist.app.models.Player;
+    let playlist;
+
+    Playlist.find({
+      order: 'index ASC'
+    })
+      .then(pl => {
+        playlist = pl;
+        return Player.currentTrackIndex();
+      })
+      .then(index => {
+        var orderedPlaylsit = [...playlist.slice(index), ...playlist.slice(0, index)];
+        return cb(null, orderedPlaylsit);
+      });
+  };
 
   Playlist.getSchedule = function(cb) {
     let Player = Playlist.app.models.Player;

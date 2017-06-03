@@ -23,6 +23,12 @@ describe('Playlist test', () => {
 
   Playlist.attachTo(db);
 
+  Player.getStatus = function(cb) {
+    cb = cb || ((err, res) => Promise.resolve(res));
+
+    return cb(null, { elapsed: 0 });
+  };
+
   let playlist;
 
   let simplifyTime = function(date) {
@@ -41,18 +47,21 @@ describe('Playlist test', () => {
   });
 
   it('it should calculate playlist time from prev', done => {
-    Playlist.createFakeTracks(4, undefined, (err, tracks) => {
-      expect(err).to.be.equal(null);
-      playlist = tracks;
-
-      tracks.reduce((prev, current) => {
-        expect(simplifyTime(prev.endTime)).to.be.equal(
-          simplifyTime(current.startTime)
-        );
-        return current;
+    Playlist.destroyAll({}).then(() => {
+      Playlist.createFakeTracks(4, undefined, (err, tracks) => {
+        console.log('err', err);
+        expect(err).to.be.equal(null);
+        playlist = tracks;
+        console.log('tracks', tracks);
+        tracks.reduce((prev, current) => {
+          expect(simplifyTime(prev.endTime)).to.be.equal(
+            simplifyTime(current.startTime)
+          );
+          return current;
+        });
+        done();
       });
-      done();
-    });
+    }).catch(done);
   });
 
   it('should properly add seconds to Date', () => {
@@ -90,20 +99,19 @@ describe('Playlist test', () => {
   });
 
   it('should add listener to next track', done => {
-    let spy = sinon.spy();
+    let spy = sinon.spy(playlist[1], 'play');
 
     let time;
-    Playlist.on('playing', spy);
+
     clock = sinon.useFakeTimers();
 
     playlist[0].playPromised().then(track => {
-      expect(Playlist.info.current).to.be.equal(playlist[0]);
       time = playlist[0].endTime.getTime() - Date.now();
       clock.tick(time);
     });
 
     setTimeout(() => {
-      expect(spy.calledWith(playlist[0])).to.be.true;
+      expect(spy.calledOnce).to.be.true;
       done();
     }, time);
   });
@@ -130,21 +138,19 @@ describe('Playlist test', () => {
     });
   });
 
-  // it('should calculate time after delete tracks', done => {
-  //   playlist[3]
-  //     .destroy()
-  //     .then(() => {
-  //       return Playlist.find({});
-  //     })
-  //     .then(tracks => {
-  //       console.log('after delete', tracks);
-  //       return Playlist.updateTimePromised();
-  //     })
-  //     .then(tracks => {
-  //       console.log('after update', tracks);
-  //       done();
-  //     });
-  // });
+  it('should calculate time after delete tracks', done => {
+    playlist[3]
+      .destroy()
+      .then(() => {
+        return Playlist.find({});
+      })
+      .then(tracks => {
+        return Playlist.updateTimePromised();
+      })
+      .then(tracks => {
+        done();
+      });
+  });
 
   afterEach(done => {
     if (clock) clock.restore();

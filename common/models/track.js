@@ -155,12 +155,9 @@ module.exports = function(Track) {
 
   Track.prototype.addToPlaylist = function(cb) {
     let Player = Track.app.models.Player;
+    let Playlist = Track.app.models.Playlist;
 
-    this.playlist
-      .create({
-        name: this.name,
-        duration: this.duration
-      })
+    Playlist.add(this)
       .then(playlistTrack => {
         return Player.addTrackPromised(this.name).then(() => playlistTrack);
       })

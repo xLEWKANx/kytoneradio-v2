@@ -61,6 +61,34 @@ describe('Playlist test', () => {
     expect(moment(endTime).format('HH-mm')).to.be.equal('12-30');
   });
 
+  it('should properly substracts seconds from Date', () => {
+    let startTime = moment('12-00', 'HH-mm').toDate();
+    let endTime = Playlist.addSecond(startTime, -30 * 60);
+    expect(moment(endTime).format('HH-mm')).to.be.equal('11-30');
+  });
+
+  it('should update time for all tracks starts from playing', done => {
+    Player.currentTrackIndex = function(cb) {
+      cb = cb || (() => Promise.resolve(4));
+      return cb(null, 4);
+    };
+
+    Player.getStatus = function(cb) {
+      cb = cb || ((err, res) => Promise.resolve(res));
+
+      return cb(null, { elapsed: 120 });
+    };
+
+    Playlist.updateTime().then(tracks => {
+      let startTime = moment().add(-120, 'second').format('HH:mm:ss');
+      expect(tracks[0].index).to.be.equal(4);
+      expect(moment(tracks[0].startTime).format('HH:mm:ss')).to.be.equal(startTime);
+      expect(moment(tracks[0].endTime).format('HH:mm:ss')).to.be.equal(moment(tracks[1].startTime).format('HH:mm:ss'));
+      expect(moment(tracks[3].endTime).format('HH:mm:ss')).to.be.equal(moment(tracks[4].startTime).format('HH:mm:ss'));
+      done();
+    });
+  });
+
   it('should add listener to next track', done => {
     let spy = sinon.spy();
 

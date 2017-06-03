@@ -1,11 +1,10 @@
-
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 var Promise = require('bluebird');
 
 global.Promise = Promise;
 
-var app = module.exports = loopback();
+var app = (module.exports = loopback());
 
 app.use(function(req, res, next) {
   res.header('Access-Control-Expose-Headers', 'x-total-count');
@@ -31,6 +30,11 @@ boot(app, __dirname, function(err) {
   if (err) throw err;
 
   // start the server if `$ node server.js`
-  if (require.main === module)
-    app.start();
+  if (require.main === module) {
+    app.io = require('socket.io')(app.start());
+
+    app.io.on('error', err => {
+      console.error('SOCKET IO', err);
+    });
+  }
 });

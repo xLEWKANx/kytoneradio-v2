@@ -39,16 +39,24 @@ module.exports = function(Player) {
       cb = index;
       index = undefined;
     }
+    cb = cb || createPromiseCallback();
+
     let arg = index === undefined ? [] : [index];
-    client.sendCommand(mpd.cmd('play', arg), (err, msg) => {
-      if (err) return cb(err);
-      Player.log(
-        {
-          command: 'play'
-        },
-        cb
-      );
-    });
+    Player.getStatus().then(status => {
+      if (status.state === 'play' && status.song == index) {
+        return cb(null, status);
+      } else {
+        client.sendCommand(mpd.cmd('play', arg), (err, msg) => {
+          if (err) return cb(err);
+          Player.log({
+            command: 'play'
+          }).then(() => cb(null, status));
+        });
+      }
+    })
+    .catch(cb);
+
+    return cb.promise;
   };
 
   Player.remoteMethod('play', {
@@ -194,25 +202,36 @@ module.exports = function(Player) {
   };
 
   Player.log = function(info, cb) {
-    Player.getStatus((err, status) => {
-      if (err) return cb(err);
-      let log = Object.assign(
-        {
-          timestamp: new Date(),
-          status
-        },
-        info
-      );
-      return Player.create(log, cb);
-    });
+    cb = cb || createPromiseCallback();
+
+    let getStatus = info.status ?
+      () => Promise.resolve(info.status) :
+      Player.getStatus;
+
+    getStatus()
+      .then(status => {
+        let log = Object.assign(
+          {
+            timestamp: new Date(),
+            status
+          },
+          info
+        );
+        return Player.create(log, cb);
+      })
+      .catch(cb);
+
+    return cb.promise;
   };
 
   Player.stream = function(req, res, cb) {
-    let stream = request('http://localhost:15001/stream').on('error', err => {
-      return cb('Stream is no avalible');
-    }).on('response', () => {
-      return cb(null, stream, 'application/octet-stream');
-    });
+    let stream = request('http://localhost:15001/stream')
+      .on('error', err => {
+        return cb('Stream is no avalible');
+      })
+      .on('response', () => {
+        return cb(null, stream, 'application/octet-stream');
+      });
 
     req.on('close', () => {
       stream.abort();

@@ -1,5 +1,5 @@
-import { put, takeEvery, takeLatest } from 'redux-saga/effects';
-import { push } from 'react-router-redux';
+import { put, /*takeEvery, */ takeLatest } from 'redux-saga/effects';
+// import { push } from 'react-router-redux';
 import { showNotification, FETCH_START, FETCH_END } from 'admin-on-rest';
 
 function* handleUpload() {

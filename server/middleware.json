@@ -40,7 +40,21 @@
       ]
     }
   },
-  "files": {},
+  "files": {
+    "loopback#static": [{
+        "paths": [
+          "/"
+        ],
+        "params": "$!../dist/client"
+      },
+      {
+        "paths": [
+          "/dashboard"
+        ],
+        "params": "$!../dist/dashboard"
+      }
+    ]
+  },
   "final": {
     "loopback#urlNotFound": {}
   },

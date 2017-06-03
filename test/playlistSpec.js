@@ -15,7 +15,7 @@ describe('Playlist test', () => {
 
   app.io = new EventEmitter();
 
-  let clock;
+  let clock, playlist;
 
   global.Promise = Promise;
 
@@ -28,8 +28,6 @@ describe('Playlist test', () => {
 
     return cb(null, { elapsed: 0 });
   };
-
-  let playlist;
 
   let simplifyTime = function(date) {
     return moment(Date.parse(date)).format('YYYY-MM-DD HH-mm');
@@ -47,21 +45,22 @@ describe('Playlist test', () => {
   });
 
   it('it should calculate playlist time from prev', done => {
-    Playlist.destroyAll({}).then(() => {
-      Playlist.createFakeTracks(4, undefined, (err, tracks) => {
-        console.log('err', err);
-        expect(err).to.be.equal(null);
-        playlist = tracks;
-        console.log('tracks', tracks);
-        tracks.reduce((prev, current) => {
-          expect(simplifyTime(prev.endTime)).to.be.equal(
-            simplifyTime(current.startTime)
-          );
-          return current;
+    Playlist.destroyAll({})
+      .then(() => {
+        Playlist.createFakeTracks(4, undefined, (err, tracks) => {
+          expect(err).to.be.equal(null);
+          playlist = tracks;
+
+          tracks.reduce((prev, current) => {
+            expect(simplifyTime(prev.endTime)).to.be.equal(
+              simplifyTime(current.startTime)
+            );
+            return current;
+          });
+          done();
         });
-        done();
-      });
-    }).catch(done);
+      })
+      .catch(done);
   });
 
   it('should properly add seconds to Date', () => {
@@ -91,9 +90,15 @@ describe('Playlist test', () => {
     Playlist.updateTime().then(tracks => {
       let startTime = moment().add(-120, 'second').format('HH:mm:ss');
       expect(tracks[0].index).to.be.equal(4);
-      expect(moment(tracks[0].startTime).format('HH:mm:ss')).to.be.equal(startTime);
-      expect(moment(tracks[0].endTime).format('HH:mm:ss')).to.be.equal(moment(tracks[1].startTime).format('HH:mm:ss'));
-      expect(moment(tracks[3].endTime).format('HH:mm:ss')).to.be.equal(moment(tracks[4].startTime).format('HH:mm:ss'));
+      expect(moment(tracks[0].startTime).format('HH:mm:ss')).to.be.equal(
+        startTime
+      );
+      expect(moment(tracks[0].endTime).format('HH:mm:ss')).to.be.equal(
+        moment(tracks[1].startTime).format('HH:mm:ss')
+      );
+      expect(moment(tracks[3].endTime).format('HH:mm:ss')).to.be.equal(
+        moment(tracks[4].startTime).format('HH:mm:ss')
+      );
       done();
     });
   });

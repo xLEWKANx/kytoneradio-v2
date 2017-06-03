@@ -76,38 +76,6 @@ module.exports = function(Playlist) {
     return cb.promise;
   };
 
-  Playlist.remoteMethod('now', {
-    http: {
-      verb: 'get'
-    },
-    returns: {
-      arg: 'track',
-      root: true,
-      type: 'obj'
-    }
-  });
-
-  Playlist.nextTrack = function(cb) {
-    let Player = Playlist.app.models.Player;
-
-    Player.nextTrackIndexPromised()
-      .then(index => {
-        return Playlist.findOnePromised({ where: { index: index } });
-      })
-      .then(track => cb(null, track))
-      .catch(cb);
-  };
-
-  Playlist.remoteMethod('nextTrack', {
-    http: {
-      verb: 'get'
-    },
-    returns: {
-      arg: 'track',
-      type: 'object'
-    }
-  });
-
   Playlist.tracksByOrder = function(cb) {
     cb = cb || createPromiseCallback();
 
@@ -307,17 +275,6 @@ module.exports = function(Playlist) {
     }
   });
 
-  Playlist.getIndex = function(cb) {
-    Playlist.count(
-      {
-        index: {
-          gte: 0
-        }
-      },
-      cb
-    );
-  };
-
   Playlist.prototype.setIndex = function(cb) {
     cb = cb || createPromiseCallback();
 
@@ -344,29 +301,13 @@ module.exports = function(Playlist) {
     return tracks;
   };
 
-  Playlist.setIndexesForTracks = function(tracks, startIndex) {
-    tracks.reduce(
-      (prev, track) => Object.assign(track, { index: prev.index + 1 }),
-      { index: startIndex - 1 }
-    );
-    return tracks;
-  };
-
-  Playlist.saveTracks = function(tracks, cb) {
-    return Promise.all(tracks)
-      .mapSeries(track => track.savePromised())
-      .then(tracks => cb(null, tracks))
-      .catch(cb);
-  };
-
-  Playlist.updateTimeAndIndex = function(tracks, options, cb) {
-    let index = options.index;
-    let startTime = options.startTime;
-    if (isFinite(index)) tracks = Playlist.setIndexesForTracks(tracks, index);
-    if (startTime) tracks = Playlist.setTimeForTracks(tracks, startTime);
-    log('updateTimeAndIndex | track updated', tracks);
-    return Playlist.saveTracks(tracks, cb);
-  };
+  // Playlist.setIndexesForTracks = function(tracks, startIndex) {
+  //   tracks.reduce(
+  //     (prev, track) => Object.assign(track, { index: prev.index + 1 }),
+  //     { index: startIndex - 1 }
+  //   );
+  //   return tracks;
+  // };
 
   Playlist.prototype.setTime = function(prev) {
     return Object.assign(this, {

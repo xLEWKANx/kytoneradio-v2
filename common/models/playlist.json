@@ -35,6 +35,14 @@
     },
     "trackId": {
       "type": "string"
+    },
+    "playedTimes": {
+      "type": "number",
+      "default": 0
+    },
+    "order": {
+      "type": "number",
+      "required": true
     }
   },
   "validations": [],

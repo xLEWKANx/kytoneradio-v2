@@ -50,7 +50,7 @@ module.exports = function(Playlist) {
       .then(playlistTrack => {
         return playlistTrack.setTimeFromPrev();
       })
-      .then(playlistTrack => playlistTrack.save())
+      .then(playlistTrack => playlistTrack.save({ skip: true }))
       .then(playlistTrack => cb(null, playlistTrack))
       .catch(cb);
     return cb.promise;
@@ -60,7 +60,6 @@ module.exports = function(Playlist) {
     cb = cb || createPromiseCallback();
 
     let Player = Playlist.app.models.Player;
-
     Player.currentTrackIndexPromised()
       .then(index => {
         return Playlist.findOne({
@@ -75,6 +74,17 @@ module.exports = function(Playlist) {
 
     return cb.promise;
   };
+
+  Playlist.remoteMethod('getCurrentTrack', {
+    http: {
+      verb: 'get'
+    },
+    returns: {
+      arg: 'track',
+      root: true,
+      type: 'object'
+    }
+  });
 
   Playlist.tracksByOrder = function(cb) {
     cb = cb || createPromiseCallback();
@@ -95,7 +105,8 @@ module.exports = function(Playlist) {
           ...playlist.slice(0, index)
         ];
         return cb(null, orderedPlaylsit);
-      });
+      })
+      .catch(cb);
 
     return cb.promise;
   };
@@ -181,9 +192,12 @@ module.exports = function(Playlist) {
     Player.play(index)
       .then(status => {
         statusTmp = status;
+        log('Playlist.play | status', status);
         return Playlist.tracksByOrder();
       })
       .then(tracks => {
+        if (!tracks.length) return cb('Playlist empty');
+        if (statusTmp.song === index) return cb(null, tracks[0]);
         let trackStartTime = moment(
           Playlist.addSecond(tracks[0].startTime, -statusTmp.elapsed)
         ).format('HH:mm:ss');
@@ -204,12 +218,14 @@ module.exports = function(Playlist) {
       })
       .then(tracks => {
         if (tracks.length) {
-          return tracks[0].play().then(track => cb(null, track));
+          return tracks[0].play().then(track => cb(null, tracks[0]));
         } else {
           cb('static play | No tracks to play');
         }
       })
       .catch(cb);
+
+    return cb.promise;
   };
 
   Playlist.remoteMethod('play', {
@@ -226,6 +242,7 @@ module.exports = function(Playlist) {
   });
 
   Playlist.updateTime = function(cb) {
+    console.log('Updating time!'.blue);
     cb = cb || createPromiseCallback();
 
     let tracks;
@@ -233,7 +250,7 @@ module.exports = function(Playlist) {
 
     Playlist.tracksByOrder()
       .then(tr => {
-        log('update time | tracks', tracks);
+        // log('update time | tracks', tr);
         tracks = tr;
 
         return Player.getStatus();
@@ -285,7 +302,8 @@ module.exports = function(Playlist) {
       (err, track) => {
         if (err) return cb(err);
         this.index = track ? track.index + 1 : 0;
-        log('set index', this.index, 'for', this.name);
+        this.order = track ? track.order + 1 : 0;
+        // log('set index', this.index, 'for', this.name);
         return cb(null, this);
       }
     );
@@ -309,31 +327,36 @@ module.exports = function(Playlist) {
   //   return tracks;
   // };
 
-  Playlist.prototype.setTime = function(prev) {
-    return Object.assign(this, {
+  Playlist.prototype.setTime = function(prev, cb) {
+    cb = cb || createPromiseCallback();
+
+    Object.assign(this, {
       startTime: prev.endTime,
       endTime: Playlist.addSecond(prev.endTime, this.duration)
     });
+
+    this.save({ skip: true }, cb);
+
+    return cb.promise;
   };
 
   Playlist.prototype.setTimeFromPrev = function(cb) {
-    log('set time for', this);
     cb = cb || createPromiseCallback();
 
     Playlist.findOne({
       order: 'index DESC'
     })
       .then(lastPlaylistTrack => {
-        log('lastPlaylistTrack', lastPlaylistTrack);
+        // log('lastPlaylistTrack', lastPlaylistTrack);
         if (!lastPlaylistTrack || lastPlaylistTrack.endTime < Date.now()) {
           lastPlaylistTrack = {
             endTime: new Date()
           };
         }
-        this.setTime(lastPlaylistTrack);
-        log('setTime track:', this);
-        cb(null, this);
+        return this.setTime(lastPlaylistTrack);
+        // log('setTime track:', this);
       })
+      .then(() => cb(null, this))
       .catch(err => {
         cb(err);
       });
@@ -358,40 +381,30 @@ module.exports = function(Playlist) {
   };
 
   Playlist.prototype.scheduleNext = function(cb) {
+    cb = cb || createPromiseCallback();
+
     let Player = Playlist.app.models.Player;
     let { endTime, index } = this;
     console.log('>>> Next track in: '.cyan, endTime, this);
     if (scheduleNext) scheduleNext.cancel();
 
     scheduleNext = schedule.scheduleJob(endTime, () => {
-      this.moveToEndPromised()
-        .then(() => Playlist.getCurrentTrack())
-        .then(track => {
-          log('play next track', track);
-          if (!track) {
-            console.log('>>> !! QUEUE END');
-            return Player.stopPromised();
-          } else {
-            return this.play();
-          }
+      console.log('Scheduler starts');
+
+      Player.currentTrackIndex()
+        // .then(() => Playlist.getCurrentTrack())
+        .then(newIndex => {
+          log('prev track', index, 'new track', newIndex);
+          return Playlist.play(newIndex);
         })
-        .catch(err => Playlist.emit('error', err));
+        .then((track) => {
+          return this.setTime(track).then(() => track);
+        })
+        .then((track) => cb(null, track))
+        .catch(cb);
     });
 
-    if (cb) return cb(null, 'success');
-  };
-
-  Playlist.prototype.moveToEnd = function(cb) {
-    return this.setIndexPromised()
-      .then(track => {
-        return track.setTimeFromPrevPromised();
-      })
-      .then(track => track.save())
-      .then(track => cb(null, track))
-      .catch(err => {
-        console.log('error', err);
-        cb(err);
-      });
+    return cb.promise;
   };
 
   Playlist.observe('after save', function(ctx, next) {

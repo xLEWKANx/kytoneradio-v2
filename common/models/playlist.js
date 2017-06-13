@@ -16,6 +16,43 @@ module.exports = function(Playlist) {
     current: null
   };
 
+  Playlist.addSecond = (date, duration) => {
+    if (!date) throw new Error(`date is ${date}`);
+    return moment(date).add(duration, 'seconds').toDate();
+  };
+
+  Playlist.prototype.simplifyTime = function() {
+    let inst = Object.assign({}, this.toJSON(), {
+      startTime: moment('2017-06-12T16:47:48.818Z').format('HH:mm:ss'),
+      endTime: moment('2017-06-12T16:47:48.818Z').format('HH:mm:ss')
+    });
+
+    return inst;
+  };
+
+  Playlist.prototype.setIndex = function(prev) {
+    this.index = prev ? prev.index + 1 : 0;
+    this.isChanged = true;
+    return this;
+  };
+
+  Playlist.prototype.setTime = function(prev) {
+    this.startTime = prev ? prev.endTime : new Date();
+    this.endTime = Playlist.addSecond(this.startTime, this.duration);
+    this.isChanged = true;
+    return this;
+  };
+
+  Playlist.prototype.setOrder = function(prev) {
+    this.order = prev ? prev.order + 1 : 0;
+    this.isChanged = true;
+    return this;
+  };
+
+  Playlist.prototype.updateInfoFromPrev = function(prev) {
+    return this.setTime(prev).setOrder(prev);
+  };
+
   Playlist.createFakeTracks = function(count, tracks = [], cb) {
     let Track = Playlist.app.models.Track;
     const TRACK_DURATION = 30 * 60;
@@ -45,14 +82,25 @@ module.exports = function(Playlist) {
       trackId: track.id
     });
 
-    playlistTrack
-      .setIndex()
-      .then(playlistTrack => {
-        return playlistTrack.setTimeFromPrev();
-      })
-      .then(playlistTrack => playlistTrack.save({ skip: true }))
-      .then(playlistTrack => cb(null, playlistTrack))
+    Playlist.findOne({
+      order: 'index DESC'
+    })
+      .then(prev => playlistTrack.setIndex(prev).updateInfoFromPrev(prev).save())
+      .then(track => cb(null, track))
       .catch(cb);
+    return cb.promise;
+  };
+
+  Playlist.prototype.moveToEnd = function(cb) {
+    cb = cb || createPromiseCallback();
+
+    Playlist.findOne({
+      order: ['order DESC', 'index DESC']
+    })
+      .then(last => this.updateInfoFromPrev(last).save())
+      .then(track => cb(null, track))
+      .catch(cb);
+
     return cb.promise;
   };
 
@@ -93,18 +141,14 @@ module.exports = function(Playlist) {
     let playlist;
 
     Playlist.find({
-      order: 'index ASC'
+      order: ['order ASC', 'index ASC']
     })
       .then(pl => {
         playlist = pl;
         return Player.currentTrackIndex();
       })
       .then(index => {
-        var orderedPlaylsit = [
-          ...playlist.slice(index),
-          ...playlist.slice(0, index)
-        ];
-        return cb(null, orderedPlaylsit);
+        return cb(null, playlist);
       })
       .catch(cb);
 
@@ -125,9 +169,13 @@ module.exports = function(Playlist) {
   Playlist.getSchedule = function(cb) {
     cb = cb || createPromiseCallback();
 
-    Playlist.tracksByOrder()
-      .then(tracks => cb(null, tracks.slice(0, 5)))
-      .catch(cb);
+    Playlist.find(
+      {
+        order: ['order ASC', 'index ASC'],
+        limit: 5
+      },
+      cb
+    );
 
     return cb.promise;
   };
@@ -139,22 +187,6 @@ module.exports = function(Playlist) {
     returns: {
       arg: 'tracks',
       root: true,
-      type: 'array'
-    }
-  });
-
-  Playlist.addSecond = (date, duration) => {
-    if (!date) throw new Error(`date is ${date}`);
-    return moment(date).add(duration, 'seconds').toDate();
-  };
-
-  Playlist.remoteMethod('decIndexFrom', {
-    accepts: {
-      arg: 'index',
-      type: 'number'
-    },
-    returns: {
-      arg: 'tracks',
       type: 'array'
     }
   });
@@ -201,9 +233,9 @@ module.exports = function(Playlist) {
         let trackStartTime = moment(
           Playlist.addSecond(tracks[0].startTime, -statusTmp.elapsed)
         ).format('HH:mm:ss');
-        let currentStartTime = moment(
-          Playlist.addSecond(new Date(), -statusTmp.elapsed)
-        ).format('HH:mm:ss');
+        let currentStartTime = moment(Playlist.addSecond(new Date(), -statusTmp.elapsed)).format(
+          'HH:mm:ss'
+        );
         let isStartTimeProper = trackStartTime === currentStartTime;
 
         if (isStartTimeProper) {
@@ -241,8 +273,8 @@ module.exports = function(Playlist) {
     }
   });
 
-  Playlist.updateTime = function(cb) {
-    console.log('Updating time!'.blue);
+  Playlist.updatePlaylist = function(cb) {
+    console.log('Updating time!'.green);
     cb = cb || createPromiseCallback();
 
     let tracks;
@@ -250,25 +282,54 @@ module.exports = function(Playlist) {
 
     Playlist.tracksByOrder()
       .then(tr => {
-        // log('update time | tracks', tr);
+        if (!tr.length) return Promise.reject('Playlist empty!');
         tracks = tr;
 
         return Player.getStatus();
       })
       .then(status => {
-        return Playlist.setTimeForTracks(
-          tracks,
-          Playlist.addSecond(new Date(), -status.elapsed)
-        );
+        let first = tracks[0];
+        let startTime;
+
+        switch (status.state) {
+          case 'playing':
+            startTime = Playlist.addSecond(new Date(), status.elapsed);
+            break;
+          default:
+            startTime = new Date();
+        }
+        _.chain(tracks)
+          .orderBy(['index'], ['asc'])
+          .reduce((prev, track) => {
+            if (prev.index !== track.index - 1) track.setIndex(prev);
+            return track;
+          })
+          .value();
+
+        log('Updated indexes', tracks);
+        let startValues = {
+          endTime: startTime,
+          index: -1,
+          order: first.order - 1
+        };
+        tracks.reduce((prev, track) => {
+          if (prev.endTime !== track.startTime) track.setTime(prev);
+          if (prev.order !== track.order - 1) track.setOrder(prev);
+          return track;
+        }, startValues);
+
+        return tracks;
       })
-      .map(track => track.save({ skip: true }))
+      .filter(track => track.isChanged)
+      .tap((tracks) => { log('changed tracks', tracks); })
+      .map(track => track.save())
       .then(tracks => cb(null, tracks))
       .catch(cb);
 
     return cb.promise;
   };
 
-  Playlist.remoteMethod('updateTime', {
+  Playlist.remoteMethod('updatePlaylist', {
     returns: {
       arg: 'tracks',
       type: 'array'
@@ -292,52 +353,12 @@ module.exports = function(Playlist) {
     }
   });
 
-  Playlist.prototype.setIndex = function(cb) {
-    cb = cb || createPromiseCallback();
-
-    Playlist.findOne(
-      {
-        order: 'index DESC'
-      },
-      (err, track) => {
-        if (err) return cb(err);
-        this.index = track ? track.index + 1 : 0;
-        this.order = track ? track.order + 1 : 0;
-        // log('set index', this.index, 'for', this.name);
-        return cb(null, this);
-      }
-    );
-
-    return cb.promise;
-  };
-
   Playlist.setTimeForTracks = function(tracks, startTime) {
     let beginingTrack = {
       endTime: startTime
     };
     tracks.reduce((prev, track) => track.setTime(prev), beginingTrack);
     return tracks;
-  };
-
-  // Playlist.setIndexesForTracks = function(tracks, startIndex) {
-  //   tracks.reduce(
-  //     (prev, track) => Object.assign(track, { index: prev.index + 1 }),
-  //     { index: startIndex - 1 }
-  //   );
-  //   return tracks;
-  // };
-
-  Playlist.prototype.setTime = function(prev, cb) {
-    cb = cb || createPromiseCallback();
-
-    Object.assign(this, {
-      startTime: prev.endTime,
-      endTime: Playlist.addSecond(prev.endTime, this.duration)
-    });
-
-    this.save({ skip: true }, cb);
-
-    return cb.promise;
   };
 
   Playlist.prototype.setTimeFromPrev = function(cb) {
@@ -347,14 +368,12 @@ module.exports = function(Playlist) {
       order: 'index DESC'
     })
       .then(lastPlaylistTrack => {
-        // log('lastPlaylistTrack', lastPlaylistTrack);
         if (!lastPlaylistTrack || lastPlaylistTrack.endTime < Date.now()) {
           lastPlaylistTrack = {
             endTime: new Date()
           };
         }
         return this.setTime(lastPlaylistTrack);
-        // log('setTime track:', this);
       })
       .then(() => cb(null, this))
       .catch(err => {
@@ -397,20 +416,15 @@ module.exports = function(Playlist) {
           log('prev track', index, 'new track', newIndex);
           return Playlist.play(newIndex);
         })
-        .then((track) => {
+        .then(track => {
           return this.setTime(track).then(() => track);
         })
-        .then((track) => cb(null, track))
+        .then(track => cb(null, track))
         .catch(cb);
     });
 
     return cb.promise;
   };
-
-  Playlist.observe('after save', function(ctx, next) {
-    if (ctx.options.skip) return next();
-    Playlist.updateTime(next);
-  });
 
   Promise.promisifyAll(Playlist, { suffix: 'Promised' });
   Promise.promisifyAll(Playlist.prototype, { suffix: 'Promised' });

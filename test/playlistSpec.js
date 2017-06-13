@@ -80,6 +80,7 @@ describe('Playlist test', () => {
 
   it('track after play must go to end of queue', done => {
     playlist[0].moveToEnd((err, track) => {
+      console.log('err', err);
       expect(err).not.to.be.ok;
       expect(track.order).to.be.equal(5);
       expect(track.startTime).to.be.equalDate(playlist[4].endTime);
@@ -104,17 +105,6 @@ describe('Playlist test', () => {
   });
 
   it('should update time for all tracks starts from playing', done => {
-    Player.currentTrackIndex = function(cb) {
-      cb = cb || (() => Promise.resolve(0));
-      return cb(null, 0);
-    };
-
-    Player.getStatus = function(cb) {
-      cb = cb || ((err, res) => Promise.resolve(res));
-
-      return cb(null, { elapsed: 120 });
-    };
-
     playlist[1].startTime = new Date();
     playlist[1].endTime = new Date();
 
@@ -129,11 +119,10 @@ describe('Playlist test', () => {
     .then(() => {
       return Playlist.find({}).then(pl => console.log(pl));
     }).then(() => {
-      return Playlist.updatePlaylist();
+      return Playlist.updatePlaylist({ elapsed: 120, state: 'playing' });
     }).then(tracks => {
-      let startTime = moment().add(-120, 'second').format('HH:mm:ss');
-      console.log('simplifyTime', tracks[0].simplifyTime(), startTime);
-      // expect(tracks[0].simplifyTime().startTime).to.be.equal(startTime);
+      let startTime = moment.utc().add(-120, 'second').format('HH:mm:ss');
+      expect(tracks[0].simplifyTime().startTime).to.be.equal(startTime);
       tracks.reduce((prev, track, i) => {
         let prevS = prev.simplifyTime();
         let trackS = track.simplifyTime();
@@ -148,19 +137,18 @@ describe('Playlist test', () => {
     });
   });
 
-  // it('should calculate time after delete tracks', done => {
-  //   playlist[3]
-  //     .destroy()
-  //     .then(() => {
-  //       return Playlist.find({});
-  //     })
-  //     .then(tracks => {
-  //       return Playlist.update();
-  //     })
-  //     .then(tracks => {
-  //       done();
-  //     });
-  // });
+  it('should calculate time after delete tracks', done => {
+    Playlist.deleteTracks([2, 3])
+      .then(() => {
+        return Playlist.find({});
+      })
+      .then(tracks => {
+        console.log('tracks', tracks);
+        expect(tracks.length).to.be.equal(3);
+        expect(tracks[2].index).to.be.equal(2);
+        done();
+      });
+  });
 
   // it('should add listener to next track', done => {
   //   let spy = sinon.spy(Playlist, 'play');

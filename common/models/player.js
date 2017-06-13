@@ -50,7 +50,7 @@ module.exports = function(Player) {
           if (err) return cb(err);
           Player.log({
             command: 'play'
-          }).then((log) => cb(null, log.status));
+          }).then((log) => Player.getStatus(cb));
         });
       }
     })

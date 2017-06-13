@@ -113,15 +113,16 @@ describe('Playlist test', () => {
     playlist[3].index = 5;
     playlist[4].index = 6;
     playlist[4].order = 15;
-
+    console.log('playlist before', playlist);
     Promise.all(playlist)
     .map((track) => track.save())
     .then(() => {
       return Playlist.find({}).then(pl => console.log(pl));
     }).then(() => {
-      return Playlist.updatePlaylist({ elapsed: 120, state: 'playing' });
+      return Playlist.updatePlaylist({ elapsed: 120, state: 'play' });
     }).then(tracks => {
       let startTime = moment.utc().add(-120, 'second').format('HH:mm:ss');
+      console.log('tracks', tracks);
       expect(tracks[0].simplifyTime().startTime).to.be.equal(startTime);
       tracks.reduce((prev, track, i) => {
         let prevS = prev.simplifyTime();

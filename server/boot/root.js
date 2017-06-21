@@ -15,12 +15,17 @@ module.exports = function(server) {
     let time = moment().format('HH:mm');
     let timezone = moment().format('Z').charAt(2);
 
-    res.write(rendererFn({
+    let html = rendererFn({
       title: 'kytoneradio',
       timenow: `${time} KYIV (+${timezone} GMT)`,
       brands: []
-    }));
+    });
+    res.writeHeader(200, {
+      'Content-Type': 'text/html'
+    });
+    res.write(html);
     res.end();
+
     next();
   });
 

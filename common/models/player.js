@@ -29,7 +29,6 @@ module.exports = function(Player) {
     });
 
     client.on('ready', () => {
-      console.log('ready?');
       cb(null, client);
     });
   };

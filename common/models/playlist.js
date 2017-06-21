@@ -165,6 +165,7 @@ module.exports = function(Playlist) {
 
     Playlist.find(
       {
+        include: ['track'],
         order: ['order ASC', 'index ASC'],
         limit: 5
       },

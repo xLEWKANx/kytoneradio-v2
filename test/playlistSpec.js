@@ -48,7 +48,6 @@ describe('Playlist test', () => {
     Playlist.destroyAll({})
       .then(() => {
         Playlist.createFakeTracks(4, undefined, (err, tracks) => {
-          console.error(err);
           expect(err).to.be.equal(null);
           playlist = tracks;
 
@@ -80,7 +79,6 @@ describe('Playlist test', () => {
 
   it('track after play must go to end of queue', done => {
     playlist[0].moveToEnd((err, track) => {
-      console.log('err', err);
       expect(err).not.to.be.ok;
       expect(track.order).to.be.equal(5);
       expect(track.startTime).to.be.equalDate(playlist[4].endTime);
@@ -113,16 +111,14 @@ describe('Playlist test', () => {
     playlist[3].index = 5;
     playlist[4].index = 6;
     playlist[4].order = 15;
-    console.log('playlist before', playlist);
     Promise.all(playlist)
     .map((track) => track.save())
     .then(() => {
-      return Playlist.find({}).then(pl => console.log(pl));
+      return Playlist.find({});
     }).then(() => {
       return Playlist.updatePlaylist({ elapsed: 120, state: 'play' });
     }).then(tracks => {
       let startTime = moment.utc().add(-120, 'second').format('HH:mm:ss');
-      console.log('tracks', tracks);
       expect(tracks[0].simplifyTime().startTime).to.be.equal(startTime);
       tracks.reduce((prev, track, i) => {
         let prevS = prev.simplifyTime();
@@ -133,7 +129,6 @@ describe('Playlist test', () => {
       });
       done();
     }).catch(err => {
-      console.log('error', err);
       expect(err).not.to.be.ok;
     });
   });
@@ -144,7 +139,6 @@ describe('Playlist test', () => {
         return Playlist.find({});
       })
       .then(tracks => {
-        console.log('tracks', tracks);
         expect(tracks.length).to.be.equal(3);
         expect(tracks[2].index).to.be.equal(2);
         done();

@@ -15,15 +15,5 @@ module.exports = function(app, next) {
     return next();
   });
 
-  app.on('inititated', () => {
-    app.io.on('connection', () => {
-      Playlist.getCurrentTrackPromised().then(track => {
-        if (track) Playlist.app.io.emit('track', track.track());
-      });
 
-      Playlist.getSchedulePromised().then(tracks => {
-        Playlist.app.io.emit('playlist', tracks);
-      });
-    });
-  });
 };

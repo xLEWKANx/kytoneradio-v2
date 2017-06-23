@@ -3,5 +3,9 @@
   "rules": {
     "object-curly-spacing": ["warn", "always"],
     "comma-dangle": ["error", "only-multiline"]
+  },
+  "globals": {
+    "angular": true,
+    "$": false
   }
 }

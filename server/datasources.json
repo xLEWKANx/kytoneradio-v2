@@ -8,7 +8,7 @@
     "name": "trackStorage",
     "provider": "filesystem",
     "connector": "loopback-component-storage",
-    "root": "~/storage",
+    "root": "./storage",
     "maxFileSize": "524288000"
   }
 }

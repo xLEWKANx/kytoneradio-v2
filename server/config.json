@@ -2,7 +2,7 @@
   "restApiRoot": "/api",
   "host": "0.0.0.0",
   "port": 3000,
-  "storagePath": "~/storage",
+  "storagePath": "./storage",
   "remoting": {
     "context": false,
     "rest": {

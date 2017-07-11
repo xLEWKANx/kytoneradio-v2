@@ -69,9 +69,9 @@
     return {
       restrict: 'A',
       link: function(scope, element, attr) {
-        Playlist.getCurrentTrack().$promise.then(pTrack => {
+        Playlist.getCurrentTrack().$promise.then(function(pTrack) {
           angular.element(element).find('p').text(pTrack.track.title);
-        })
+        });
         socket.on('track', function(pTrack) {
           if (pTrack.track) {
             angular.element(element).find('p').text('Kytone Radio (c)');

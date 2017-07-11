@@ -75,7 +75,7 @@
 
   function scheduleCtrl($scope, socket, Playlist) {
     var vm = this;
-    Playlist.getSchedule().$promise.then((tracks) => {
+    Playlist.getSchedule().$promise.then(function(tracks) {
       vm.next = formatTracks(tracks);
     });
 

@@ -40,7 +40,7 @@
     "timekeeper": "^1.0.0"
   },
   "dependencies": {
-    "admin-on-rest": "^1.0.2",
+    "admin-on-rest": "^1.2.1",
     "aor-loopback": "^1.2.2",
     "compression": "^1.0.3",
     "cors": "^2.5.2",

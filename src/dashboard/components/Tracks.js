@@ -3,30 +3,24 @@ import {
   List,
   Datagrid,
   FunctionField,
-  ImageField,
   BooleanField,
   TextField,
   EditButton,
   Edit,
   SimpleForm,
-  BooleanInput,
-  SelectInput,
-  LongTextInput,
   TextInput,
-  NumberInput,
-  NumberField,
   Filter,
-  Create
+  showNotification as showNotificationAction
 } from 'admin-on-rest';
-import ConditionalField from '../aor-components/fields/ConditionalField';
+
 import { CardActions } from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import NavigationRefresh from 'material-ui/svg-icons/navigation/refresh';
-import { ListButton, DeleteButton } from 'admin-on-rest';
+import { DeleteButton } from 'admin-on-rest';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
-import { fetchJson } from 'aor-loopback';
+import Track from '../api/Track';
 
 import Uploader from './Uploader';
 // import { Grid, Row, Col } from 'react-flexbox-grid';
@@ -37,14 +31,15 @@ const cardActionStyle = {
   float: 'right'
 };
 
-const PostActions = ({
+let PostActions = ({
   resource,
   filters,
   displayedFilters,
   filterValues,
   basePath,
   showFilter,
-  refresh
+  refresh,
+  showNotification
 }) => (
   <CardActions style={cardActionStyle}>
     {filters &&
@@ -65,14 +60,19 @@ const PostActions = ({
       primary
       label="Scan Tracks"
       onClick={(e) => {
-        fetchJson('http://0.0.0.0:3027/api/tracks/scanDir', { method: 'POST' }).then((res) => {
-          console.log(res);
+        e.persist();
+        Track.scanDir().then((res) => {
+          showNotification(`${res.length} new tracks`);
           refresh(e);
         });
       }}
     />
   </CardActions>
 );
+
+PostActions = connect(null, {
+  showNotification: showNotificationAction
+})(PostActions);
 
 const TrackFilter = props => (
   <Filter {...props}>
@@ -88,7 +88,10 @@ export const TrackList = props => (
         <FunctionField
           label="Time"
           render={record =>
-            moment.utc(0).seconds(record.duration).format('HH:mm:ss')}
+            record.duration ?
+            moment.utc(0).seconds(record.duration).format('HH:mm:ss') :
+            null
+          }
         />
         <BooleanField source="processed" label="Processed" />
         <TextField source="title" label="Track" />
@@ -98,14 +101,6 @@ export const TrackList = props => (
     </List>
   </div>
 );
-
-function mapStateToProps(state, props) {
-  return {
-    formState: state.form['record-form'] ?
-      state.form['record-form'].values :
-      null
-  };
-}
 
 export const TrackEdit = props => (
   <Edit {...props}>

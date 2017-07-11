@@ -16,9 +16,12 @@ import {
 import { CardActions } from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import NavigationRefresh from 'material-ui/svg-icons/navigation/refresh';
+import PlaylistAddIcon from 'material-ui/svg-icons/av/playlist-add';
+import LibraryAddIcon from 'material-ui/svg-icons/av/library-add';
 import { DeleteButton } from 'admin-on-rest';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import ListButton from '../aor-components/buttons/ListButton';
 
 import Track from '../api/Track';
 
@@ -40,7 +43,7 @@ let PostActions = ({
   showFilter,
   refresh,
   showNotification
-}) => (
+}) =>
   <CardActions style={cardActionStyle}>
     {filters &&
       React.cloneElement(filters, {
@@ -59,28 +62,29 @@ let PostActions = ({
     <FlatButton
       primary
       label="Scan Tracks"
-      onClick={(e) => {
+      icon={<LibraryAddIcon />}
+      onClick={e => {
         e.persist();
-        Track.scanDir().then((res) => {
+        Track.scanDir().then(res => {
           showNotification(`${res.length} new tracks`);
           refresh(e);
-        });
+        }).catch((err) =>
+          showNotification(`Error: ${err.message}`, 'warning')
+        );
       }}
     />
-  </CardActions>
-);
+  </CardActions>;
 
 PostActions = connect(null, {
   showNotification: showNotificationAction
 })(PostActions);
 
-const TrackFilter = props => (
+const TrackFilter = props =>
   <Filter {...props}>
     <TextInput source="title" alwaysOn />
-  </Filter>
-);
+  </Filter>;
 
-export const TrackList = props => (
+export let TrackList = (props) =>
   <div>
     <Uploader />
     <List {...props} filters={<TrackFilter />} actions={<PostActions />}>
@@ -89,20 +93,34 @@ export const TrackList = props => (
           label="Time"
           render={record =>
             record.duration ?
-            moment.utc(0).seconds(record.duration).format('HH:mm:ss') :
-            null
-          }
+              moment.utc(0).seconds(record.duration).format('HH:mm:ss') :
+              null}
         />
         <BooleanField source="processed" label="Processed" />
         <TextField source="title" label="Track" />
+        <ListButton
+          buttonLabel="Add To Playlist"
+          disabledField="isProccesed"
+          icon={<PlaylistAddIcon />}
+          onClick={record => {
+            new Track(record).addToPlaylist().then(res => {
+              console.log(res);
+              let startTime = moment(res.startTime).format('HH:mm:ss');
+              props.showNotification(`Track will be played at ${startTime}`);
+            });
+          }}
+        />
         <EditButton />
         <DeleteButton />
       </Datagrid>
     </List>
-  </div>
-);
+  </div>;
 
-export const TrackEdit = props => (
+TrackList = connect(null, {
+  showNotification: showNotificationAction
+})(TrackList);
+
+export const TrackEdit = props =>
   <Edit {...props}>
     <SimpleForm {...props}>
       <TextInput
@@ -112,5 +130,4 @@ export const TrackEdit = props => (
         source="title"
       />
     </SimpleForm>
-  </Edit>
-);
+  </Edit>;

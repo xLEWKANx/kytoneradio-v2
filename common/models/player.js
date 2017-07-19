@@ -23,7 +23,7 @@ module.exports = function(Player) {
     }
 
     client.on('error', err => {
-      cb(err);
+      console.error('mpd error: ', err);
     });
 
     client.on('ready', () => {

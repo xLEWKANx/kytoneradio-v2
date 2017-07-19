@@ -11,21 +11,19 @@ module.exports = function(Player) {
   let state = {
     isPlaying: false
   };
-  Player.on('error', err => {
-    Player.log({
-      error: err
-    });
-  });
 
   Player.bootstrap = function(mpd, cb) {
-    client = mpd.connect({
-      port: process.env.MPD_PORT || 6600,
-      host: 'localhost'
-    });
+    try {
+      client = mpd.connect({
+        port: process.env.MPD_PORT || 6600,
+        host: 'localhost'
+      });
+    } catch (err) {
+      return cb(err);
+    }
+
     client.on('error', err => {
       cb(err);
-      console.error('Player | boostrap error:', err);
-      Player.emit('error', err);
     });
 
     client.on('ready', () => {

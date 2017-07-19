@@ -29,7 +29,19 @@
       "enabled": false
     }
   },
-  "session": {},
+  "session": {
+    "express-session": {
+      "params": {
+        "secret": "My super session secret",
+        "resave": false,
+        "saveUninitialized": true,
+        "cookie": {
+          "httpOnly": true,
+          "secure": true
+        }
+      }
+    }
+  },
   "auth": {},
   "parse": {},
   "routes": {

@@ -9,11 +9,9 @@ module.exports = function(app, next) {
 
   Player.bootstrap(mpd, (err, msg) => {
     debug('Player bootstrap run');
-    if (err) return next(err);
+    if (err) return next();
 
     Playlist.play();
     return next();
   });
-
-
 };

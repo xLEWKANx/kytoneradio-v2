@@ -1,8 +1,7 @@
-import Playlist from './Playlist';
-import { fetchJson, queryParams } from './fetch'
+import { fetchJson, queryParams } from '../utils/fetch';
 
 const api = 'http://localhost:3027/api';
-class Track {
+class Setting {
   constructor(model) {
     Object.assign(this, model);
   }
@@ -11,7 +10,7 @@ class Track {
   static baseUrl() {
     return `${this.api}${this.resource}`;
   }
-  static resource = '/tracks';
+  static resource = '/settings';
   
   static fetch(url, options) {
     return fetchJson(url, options).then(
@@ -19,73 +18,6 @@ class Track {
     );
   }
 
-  __findById__playlist(fk) { 
-    let url = `${this.constructor.baseUrl()}/${this.id}/playlist/${fk}`;
-    return this.constructor.fetch(url, {
-      method: 'GET',
-    }).then(res => {
-      return new Playlist(res)
-    }).catch(err => Promise.reject(err))
-  }
-  
-  __destroyById__playlist(fk) { 
-    let url = `${this.constructor.baseUrl()}/${this.id}/playlist/${fk}`;
-    return this.constructor.fetch(url, {
-      method: 'DELETE',
-    }).then(res => {
-      return res;
-    }).catch(err => Promise.reject(err))
-  }
-  
-  __updateById__playlist(fk, data) { 
-    let url = `${this.constructor.baseUrl()}/${this.id}/playlist/${fk}`;
-    let body = data;
-    return this.constructor.fetch(url, {
-      method: 'PUT',
-      body: JSON.stringify(body) 
-    }).then(res => {
-      return new Playlist(res)
-    }).catch(err => Promise.reject(err))
-  }
-  
-  __get__playlist(filter) { 
-    let url = `${this.constructor.baseUrl()}/${this.id}/playlist${queryParams({ filter })}`;
-    return this.constructor.fetch(url, {
-      method: 'GET',
-    }).then(res => {
-      return res.map(i => new Playlist(i))
-    }).catch(err => Promise.reject(err))
-  }
-  
-  __create__playlist(data) { 
-    let url = `${this.constructor.baseUrl()}/${this.id}/playlist`;
-    let body = data;
-    return this.constructor.fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(body) 
-    }).then(res => {
-      return new Playlist(res)
-    }).catch(err => Promise.reject(err))
-  }
-  
-  __delete__playlist() { 
-    let url = `${this.constructor.baseUrl()}/${this.id}/playlist`;
-    return this.constructor.fetch(url, {
-      method: 'DELETE',
-    }).then(res => {
-      return res;
-    }).catch(err => Promise.reject(err))
-  }
-  
-  __count__playlist(where) { 
-    let url = `${this.constructor.baseUrl()}/${this.id}/playlist/count${queryParams({ where })}`;
-    return this.constructor.fetch(url, {
-      method: 'GET',
-    }).then(res => {
-      return res;
-    }).catch(err => Promise.reject(err))
-  }
-  
   static create(data) { 
     let url = `${this.baseUrl()}/`;
     let body = data;
@@ -93,7 +25,7 @@ class Track {
       method: 'POST',
       body: JSON.stringify(body) 
     }).then(res => {
-      return new Track(res)
+      return new Setting(res)
     }).catch(err => Promise.reject(err))
   }
   
@@ -104,7 +36,7 @@ class Track {
       method: 'PATCH',
       body: JSON.stringify(body) 
     }).then(res => {
-      return new Track(res)
+      return new Setting(res)
     }).catch(err => Promise.reject(err))
   }
   
@@ -115,7 +47,7 @@ class Track {
       method: 'POST',
       body: JSON.stringify(body) 
     }).then(res => {
-      return new Track(res)
+      return new Setting(res)
     }).catch(err => Promise.reject(err))
   }
   
@@ -126,7 +58,7 @@ class Track {
       method: 'POST',
       body: JSON.stringify(body) 
     }).then(res => {
-      return new Track(res)
+      return new Setting(res)
     }).catch(err => Promise.reject(err))
   }
   
@@ -144,7 +76,7 @@ class Track {
     return this.fetch(url, {
       method: 'GET',
     }).then(res => {
-      return new Track(res)
+      return new Setting(res)
     }).catch(err => Promise.reject(err))
   }
   
@@ -155,7 +87,7 @@ class Track {
       method: 'POST',
       body: JSON.stringify(body) 
     }).then(res => {
-      return new Track(res)
+      return new Setting(res)
     }).catch(err => Promise.reject(err))
   }
   
@@ -164,7 +96,7 @@ class Track {
     return this.fetch(url, {
       method: 'GET',
     }).then(res => {
-      return res.map(i => new Track(i))
+      return res.map(i => new Setting(i))
     }).catch(err => Promise.reject(err))
   }
   
@@ -173,7 +105,7 @@ class Track {
     return this.fetch(url, {
       method: 'GET',
     }).then(res => {
-      return new Track(res)
+      return new Setting(res)
     }).catch(err => Promise.reject(err))
   }
   
@@ -213,7 +145,7 @@ class Track {
       method: 'PATCH',
       body: JSON.stringify(body) 
     }).then(res => {
-      return new Track(res)
+      return new Setting(res)
     }).catch(err => Promise.reject(err))
   }
   
@@ -226,33 +158,6 @@ class Track {
       return res;
     }).catch(err => Promise.reject(err))
   }
-  
-  addToPlaylist() { 
-    let url = `${this.constructor.baseUrl()}/${this.id}/addToPlaylist`;
-    return this.constructor.fetch(url, {
-      method: 'POST',
-    }).then(res => {
-      return res;
-    }).catch(err => Promise.reject(err))
-  }
-  
-  static scanDir() { 
-    let url = `${this.baseUrl()}/scanDir`;
-    return this.fetch(url, {
-      method: 'POST',
-    }).then(res => {
-      return res;
-    }).catch(err => Promise.reject(err))
-  }
-  
-  getMeta() { 
-    let url = `${this.constructor.baseUrl()}/${this.id}/getMeta`;
-    return this.constructor.fetch(url, {
-      method: 'POST',
-    }).then(res => {
-      return res;
-    }).catch(err => Promise.reject(err))
-  }
   }
 
-export default Track;
+export default Setting;

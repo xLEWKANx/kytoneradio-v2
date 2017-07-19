@@ -23,7 +23,7 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import ListButton from '../aor-components/buttons/ListButton';
 
-import Track from '../api/Track';
+import { Track } from '../api';
 
 import Uploader from './Uploader';
 // import { Grid, Row, Col } from 'react-flexbox-grid';
@@ -84,7 +84,7 @@ const TrackFilter = props =>
     <TextInput source="title" alwaysOn />
   </Filter>;
 
-export let TrackList = (props) =>
+export let TrackList = ({ showNotification, ...props }) =>
   <div>
     <Uploader />
     <List {...props} filters={<TrackFilter />} actions={<PostActions />}>
@@ -104,10 +104,11 @@ export let TrackList = (props) =>
           icon={<PlaylistAddIcon />}
           onClick={record => {
             new Track(record).addToPlaylist().then(res => {
-              console.log(res);
               let startTime = moment(res.startTime).format('HH:mm:ss');
               props.showNotification(`Track will be played at ${startTime}`);
-            });
+            }).catch((err) =>
+              showNotification(`Error: ${err.message}`, 'warning')
+            );
           }}
         />
         <EditButton />

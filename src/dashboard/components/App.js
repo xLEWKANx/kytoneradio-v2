@@ -9,19 +9,22 @@ import { PlayList, PlayEdit } from './Playlist';
 
 import uploadSaga from '../sideEffect/saga/uploadSaga';
 
-const App = () => (
+const App = () =>
   <Admin
     customReducers={{ reducers }}
     customSagas={[uploadSaga]}
-    // authClient={ authClient('http://localhost:3027/api/users') }
+    // authClient={authClient('http://localhost:3027/api/users/login')}
     restClient={loopbackRestClient('http://localhost:3027/api', undefined, {
-      filterTransform: ({ title, ...rest }) => (title ? {
-        title: {
-          like: `${title}`,
-          options: 'i'
-        },
-        ...rest
-      } : { ...rest })
+      filterTransform: ({ title, ...rest }) =>
+        title ?
+        {
+          title: {
+            like: `${title}`,
+            options: 'i'
+          },
+          ...rest
+        } :
+          { ...rest }
     })}
   >
     <Resource
@@ -33,7 +36,6 @@ const App = () => (
     />
     <Resource name="tracks" list={TrackList} edit={TrackEdit} remove={Delete} />
     <Resource name="playlist" list={PlayList} edit={PlayEdit} remove={Delete} />
-  </Admin>
-);
+  </Admin>;
 
 export default App;

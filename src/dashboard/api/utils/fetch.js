@@ -1,3 +1,6 @@
+import HttpError from './HttpError';
+import storage from './storage';
+
 export const fetchJson = (url, options = {}) => {
   const requestHeaders =
     options.headers ||
@@ -9,6 +12,14 @@ export const fetchJson = (url, options = {}) => {
   }
   if (options.user && options.user.authenticated && options.user.token) {
     requestHeaders.set('Authorization', options.user.token);
+  } else {
+    let token = storage.load('lbtoken');
+    token = (token && token.id) || '';
+    if (url.indexOf('?') >= 0) {
+      url = url + '&access_token=' + token;
+    } else {
+      url = url + '?access_token=' + token;
+    }
   }
 
   return fetch(url, { ...options, headers: requestHeaders })
@@ -25,12 +36,11 @@ export const fetchJson = (url, options = {}) => {
       try {
         json = JSON.parse(body);
       } catch (e) {
-        console.error('parse error', e);
         // not json, no big deal
       }
       if (status < 200 || status >= 300) {
         return Promise.reject(
-          ((json && json.message) || statusText, status)
+          new HttpError((json && json.message) || statusText, status)
         );
       }
       return { status, headers, body, json };
@@ -44,11 +54,11 @@ export const queryParams = data => {
     }
   }
   return (
-    '?' + Object.keys(data)
+    '?' +
+    Object.keys(data)
       .map(key =>
         [key, JSON.stringify(data[key])].map(encodeURIComponent).join('=')
       )
       .join('&')
   );
 };
-

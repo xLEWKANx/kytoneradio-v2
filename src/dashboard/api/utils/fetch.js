@@ -10,16 +10,10 @@ export const fetchJson = (url, options = {}) => {
   if (!(options && options.body && options.body instanceof FormData)) {
     requestHeaders.set('Content-Type', 'application/json');
   }
-  if (options.user && options.user.authenticated && options.user.token) {
+  let token = storage.load('lbtoken');
+
+  if (token.id) {
     requestHeaders.set('Authorization', options.user.token);
-  } else {
-    let token = storage.load('lbtoken');
-    token = (token && token.id) || '';
-    if (url.indexOf('?') >= 0) {
-      url = url + '&access_token=' + token;
-    } else {
-      url = url + '?access_token=' + token;
-    }
   }
 
   return fetch(url, { ...options, headers: requestHeaders })
@@ -54,11 +48,11 @@ export const queryParams = data => {
     }
   }
   return (
-    '?' +
-    Object.keys(data)
+    '?' + Object.keys(data)
       .map(key =>
         [key, JSON.stringify(data[key])].map(encodeURIComponent).join('=')
       )
       .join('&')
   );
 };
+

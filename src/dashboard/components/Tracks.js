@@ -105,7 +105,7 @@ export let TrackList = ({ showNotification, ...props }) =>
           onClick={record => {
             new Track(record).addToPlaylist().then(res => {
               let startTime = moment(res.startTime).format('HH:mm:ss');
-              props.showNotification(`Track will be played at ${startTime}`);
+              showNotification(`Track will be played at ${startTime}`);
             }).catch((err) =>
               showNotification(`Error: ${err.message}`, 'warning')
             );

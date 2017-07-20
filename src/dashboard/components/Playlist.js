@@ -74,33 +74,33 @@ const cardActionStyle = {
 //   </CardActions>
 // );
 
-const TrackFilter = props => (
+const TrackFilter = props =>
   <Filter {...props}>
     <TextInput source="title" alwaysOn />
-  </Filter>
-);
+  </Filter>;
 
-export const PlayList = props => (
+export const PlayList = props =>
   <div>
-    <List {...props} filters={<TrackFilter />} /* actions={<PostActions /> } */>
+    <List
+      {...props}
+      sort={{ field: 'order', order: 'ASC' }}
+      filters={<TrackFilter />} /* actions={<PostActions /> } */
+    >
       <Datagrid>
         <FunctionField
           label="Start Time"
-          render={record =>
-            moment(record.startTime).format('HH:mm:ss')}
+          render={record => moment(record.startTime).format('HH:mm:ss')}
         />
         <FunctionField
           label="End Time"
-          render={record =>
-            moment(record.endTime).format('HH:mm:ss')}
+          render={record => moment(record.endTime).format('HH:mm:ss')}
         />
         <TextField source="name" label="Track" />
         <EditButton />
         <DeleteButton />
       </Datagrid>
     </List>
-  </div>
-);
+  </div>;
 
 // function mapStateToProps(state, props) {
 //   return {
@@ -110,7 +110,7 @@ export const PlayList = props => (
 //   };
 // }
 
-export const PlayEdit = props => (
+export const PlayEdit = props =>
   <Edit {...props}>
     <SimpleForm {...props}>
       <TextInput
@@ -120,5 +120,4 @@ export const PlayEdit = props => (
         source="name"
       />
     </SimpleForm>
-  </Edit>
-);
+  </Edit>;

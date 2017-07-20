@@ -8,6 +8,4 @@ export { default as Setting } from './lib/Setting';
 export { default as musicStorage } from './lib/musicStorage';
 
 export * from './utils/fetch';
-export * from './utils/HttpError';
-export * from './utils/storage';
 

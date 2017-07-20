@@ -13,7 +13,7 @@ const App = () =>
   <Admin
     customReducers={{ reducers }}
     customSagas={[uploadSaga]}
-    authClient={authClient('http://localhost:3027/api/users/login')}
+    // authClient={authClient('http://localhost:3027/api/users/login')}
     restClient={loopbackRestClient('http://localhost:3027/api', undefined, {
       filterTransform: ({ title, ...rest }) =>
         title ?

@@ -87,7 +87,9 @@ module.exports = function(Playlist) {
     Playlist.findOne({
       order: 'index DESC'
     })
-      .then(prev => playlistTrack.setIndex(prev).updateInfoFromPrev(prev).save())
+      .then(prev =>
+        playlistTrack.setIndex(prev).updateInfoFromPrev(prev).save()
+      )
       .then(track => cb(null, track))
       .catch(cb);
     return cb.promise;
@@ -210,14 +212,20 @@ module.exports = function(Playlist) {
     }
   });
 
-  Playlist.updatePlaylist = function(status, cb) {
-    console.log('Updating time!'.green, status);
+  Playlist.updatePlaylist = function(inputStatus, cb) {
+    console.log('Updating time!'.green, inputStatus);
     cb = cb || createPromiseCallback();
+    let Player = Playlist.app.models.Player;
 
-    Playlist.find({
+    let promises = [Playlist.find({
       order: 'index ASC'
-    })
-      .then(tracks => {
+    })];
+
+    if (!inputStatus) promises.push(Player.getStatus());
+
+    Promise.all(promises)
+      .then((res) => {
+        let [tracks, status = inputStatus] = res;
         if (!tracks.length) return Promise.reject('Playlist empty!');
         let startTime;
 
@@ -249,9 +257,6 @@ module.exports = function(Playlist) {
 
         return orderedPlaylsit;
       })
-      .tap(tracks => {
-        log('changed tracks', tracks);
-      })
       .map(track => track.save())
       .then(tracks => cb(null, tracks))
       .catch(cb);
@@ -260,6 +265,10 @@ module.exports = function(Playlist) {
   };
 
   Playlist.remoteMethod('updatePlaylist', {
+    accepts: {
+      arg: 'status',
+      type: 'object'
+    },
     returns: {
       arg: 'tracks',
       type: 'array',
@@ -286,6 +295,27 @@ module.exports = function(Playlist) {
 
     return cb.promise;
   };
+
+  Playlist.observe('before delete', (ctx, next) => {
+    console.log('before delete', ctx.options.skip);
+    if (ctx.options.skip) return next();
+    let Player = ctx.Model.app.models.Player;
+    Playlist.find({
+      where: ctx.where
+    })
+      .then(ptracks => {
+        return Promise.all(ptracks.map(ptrack => Player.deleteTrack(ptrack.index)));
+      })
+      .then(res => {
+        next();
+      })
+      .catch(next);
+  });
+
+  Playlist.observe('after delete', (ctx, next) => {
+    if (ctx.options.skip) return next();
+    Playlist.updatePlaylist(null, next);
+  });
 
   Playlist.stop = function(cb) {
     let Player = Playlist.app.models.Player;

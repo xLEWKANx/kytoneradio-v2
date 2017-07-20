@@ -137,10 +137,14 @@ module.exports = function(Player) {
   });
 
   Player.deleteTrack = function(position, cb) {
+    cb = cb || createPromiseCallback();
+
     client.sendCommand(mpd.cmd('delete', [position]), (err, msg) => {
       if (err) return cb(err);
       return cb(null, msg);
     });
+
+    return cb.promise;
   };
 
   Player.moveTrack = function(require, to, cb) {

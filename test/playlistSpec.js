@@ -29,12 +29,18 @@ describe('Playlist test', () => {
     return cb(null, { elapsed: 0 });
   };
 
+  Player.deleteTrack = function(name, cb) {
+    cb = cb || ((err, res) => Promise.resolve(res));
+
+    return cb(null);
+  };
+
   let simplifyTime = function(date) {
     return moment(Date.parse(date)).format('YYYY-MM-DD HH-mm');
   };
 
   before(done => {
-    Playlist.destroyAll({}, done);
+    Playlist.destroyAll({}, { skip: true }, done);
   });
 
   beforeEach(done => {
@@ -45,7 +51,7 @@ describe('Playlist test', () => {
   });
 
   it('it should calculate playlist time from prev', done => {
-    Playlist.destroyAll({})
+    Playlist.destroyAll({}, { skip: true })
       .then(() => {
         Playlist.createFakeTracks(4, undefined, (err, tracks) => {
           expect(err).to.be.equal(null);
@@ -180,7 +186,7 @@ describe('Playlist test', () => {
 
   afterEach(done => {
     if (clock) clock.restore();
-    Playlist.destroyAll({}).then((info) => {
+    Playlist.destroyAll({}, { skip: true }).then((info) => {
       done();
     });
   });

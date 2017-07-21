@@ -6,6 +6,7 @@ import reducers from '../reducer';
 import { SlideList, SlideEdit, SlideCreate } from './Slides';
 import { TrackList, TrackEdit } from './Tracks';
 import { PlayList, PlayEdit } from './Playlist';
+import { filterTransform } from '../lib/filterTransform';
 
 import uploadSaga from '../sideEffect/saga/uploadSaga';
 
@@ -14,18 +15,7 @@ const App = () =>
     customReducers={{ reducers }}
     customSagas={[uploadSaga]}
     authClient={authClient('http://localhost:3027/api/users/login')}
-    restClient={loopbackRestClient('http://localhost:3027/api', undefined, {
-      filterTransform: ({ title, ...rest }) =>
-        title ?
-        {
-          title: {
-            like: `${title}`,
-            options: 'i'
-          },
-          ...rest
-        } :
-          { ...rest }
-    })}
+    restClient={loopbackRestClient('http://localhost:3027/api', undefined, filterTransform)}
   >
     <Resource
       name="slides"

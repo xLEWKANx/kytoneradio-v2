@@ -3,88 +3,39 @@ import {
   List,
   Datagrid,
   FunctionField,
-  ImageField,
-  BooleanField,
+  DateInput,
   TextField,
   EditButton,
   Edit,
   SimpleForm,
-  BooleanInput,
-  SelectInput,
-  LongTextInput,
   TextInput,
-  NumberInput,
-  NumberField,
-  Filter,
-  Create
+  DeleteButton,
+  Filter
 } from 'admin-on-rest';
-import ConditionalField from '../aor-components/fields/ConditionalField';
-import { CardActions } from 'material-ui/Card';
-import FlatButton from 'material-ui/FlatButton';
-import NavigationRefresh from 'material-ui/svg-icons/navigation/refresh';
-import { ListButton, DeleteButton } from 'admin-on-rest';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
-import { fetchJson } from 'aor-loopback';
-
-import Uploader from './Uploader';
-// import { Grid, Row, Col } from 'react-flexbox-grid';
-
-const cardActionStyle = {
-  zIndex: 2,
-  display: 'inline-block',
-  float: 'right'
-};
-
-// const PostActions = ({
-//   resource,
-//   filters,
-//   displayedFilters,
-//   filterValues,
-//   basePath,
-//   showFilter,
-//   refresh
-// }) => (
-//   <CardActions style={cardActionStyle}>
-//     {filters &&
-//       React.cloneElement(filters, {
-//         resource,
-//         showFilter,
-//         displayedFilters,
-//         filterValues,
-//         context: 'button'
-//       })}
-//     <FlatButton
-//       primary
-//       label="refresh"
-//       onClick={refresh}
-//       icon={<NavigationRefresh />}
-//     />
-//     <FlatButton
-//       primary
-//       label="Scan Tracks"
-//       onClick={(e) => {
-//         fetchJson('http://0.0.0.0:3027/api/tracks/scanDir', { method: 'POST' }).then((res) => {
-//           console.log(res);
-//           refresh(e);
-//         });
-//       }}
-//     />
-//   </CardActions>
-// );
-
-const TrackFilter = props =>
+const PlaylistFilter = props =>
   <Filter {...props}>
-    <TextInput source="title" alwaysOn />
+    <DateInput
+      label="Day"
+      source="startTime"
+      alwaysOn
+      options={{
+        defaultDate: new Date(),
+        minDate: new Date(),
+        formatDate: value => moment(value).format('DD MMM YYYY')
+      }}
+    />
   </Filter>;
 
 export const PlayList = props =>
   <div>
     <List
       {...props}
-      sort={{ field: 'order', order: 'ASC' }}
-      filters={<TrackFilter />} /* actions={<PostActions /> } */
+      sort={{ field: 'startTime', order: 'ASC' }}
+      list={{}}
+      filters={<PlaylistFilter />} /* actions={<PostActions /> } */
     >
       <Datagrid>
         <FunctionField
@@ -101,14 +52,6 @@ export const PlayList = props =>
       </Datagrid>
     </List>
   </div>;
-
-// function mapStateToProps(state, props) {
-//   return {
-//     formState: state.form['record-form'] ?
-//       state.form['record-form'].values :
-//       null
-//   };
-// }
 
 export const PlayEdit = props =>
   <Edit {...props}>

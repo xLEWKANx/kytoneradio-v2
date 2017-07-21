@@ -179,8 +179,7 @@ module.exports = function(Player) {
     client.sendCommand(mpd.cmd('playlist', []), (err, msg) => {
       if (err) return cb(err);
       if (msg) msg = mpd.parseKeyValueMessage(msg);
-
-      return cb(null, msg || {});
+      return cb(null, Player.parsePlaylist(msg) || {});
     });
 
     return cb.promise;

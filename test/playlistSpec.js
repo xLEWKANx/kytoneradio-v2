@@ -109,6 +109,17 @@ describe('Playlist test', () => {
   });
 
   it('should update time for all tracks starts from playing', done => {
+    console.log('playlist', playlist);
+    Player.playlist = function(cb) {
+      return cb(null, {
+        '0': 'test track 0',
+        '1': 'test track 1',
+        '2': 'test track 2',
+        '3': 'test track 3',
+        '4': 'test track 4',
+      });
+    };
+
     playlist[1].startTime = new Date();
     playlist[1].endTime = new Date();
 
@@ -116,7 +127,7 @@ describe('Playlist test', () => {
     playlist[3].index = 5;
     playlist[3].index = 5;
     playlist[4].index = 6;
-    playlist[4].order = 15;
+
     Promise.all(playlist)
     .map((track) => track.save())
     .then(() => {

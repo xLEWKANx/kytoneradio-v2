@@ -60,9 +60,8 @@ module.exports = function(Playlist) {
     const TRACK_DURATION = 30 * 60;
 
     const MOCK_TRACK = new Track({
-      name: 'test track',
+      name: 'test track ' + tracks.length,
       processed: true,
-      id: 1,
       duration: TRACK_DURATION
     });
 
@@ -112,7 +111,7 @@ module.exports = function(Playlist) {
     cb = cb || createPromiseCallback();
 
     let Player = Playlist.app.models.Player;
-    Player.currentTrackIndexPromised()
+    Player.currentTrackIndex()
       .then(index => {
         return Playlist.findOne({
           where: {
@@ -212,20 +211,66 @@ module.exports = function(Playlist) {
     }
   });
 
+  Playlist.checkIndex = function(cb) {
+    cb = cb || createPromiseCallback();
+
+    let Player = Playlist.app.models.Player;
+
+    let promises = [Playlist.find({}), Player.playlist()];
+
+    Promise.all(promises).then(res => {
+      let [playlist, mpdPlaylist] = res;
+      log('check index', mpdPlaylist, playlist);
+
+      if (playlist.length !== Object.keys(mpdPlaylist).length) {
+        return Promise.reject(new Error('playlist don\'t match'));
+      }
+      let allMatch = playlist.every((track) =>
+        mpdPlaylist[track.index] === track.name
+      );
+
+      if (!allMatch) {
+        return Promise.reject(new Error('playlist have wrong index'));
+      }
+
+      return cb(null, true);
+    }).catch(cb);
+
+    return cb.promise;
+  };
+
+  Playlist.remoteMethod('checkIndex', {
+    http: {
+      verb: 'get'
+    },
+    returns: {
+      arg: 'match',
+      type: 'boolean'
+    }
+  });
+
+  // Playlist.updateIndex = function(mpdPlaylist, tracks) {
+  //   let mpdPlaylistArr = Object.keys(mpdPlaylist);
+  //   mpdPlaylistArr.map
+  // };
+
   Playlist.updatePlaylist = function(inputStatus, cb) {
     console.log('Updating time!'.green, inputStatus);
     cb = cb || createPromiseCallback();
     let Player = Playlist.app.models.Player;
 
-    let promises = [Playlist.find({
-      order: 'index ASC'
-    })];
+    let promises = [
+      Playlist.find({
+        order: 'index ASC'
+      }),
+      Player.playlist()
+    ];
 
     if (!inputStatus) promises.push(Player.getStatus());
 
     Promise.all(promises)
-      .then((res) => {
-        let [tracks, status = inputStatus] = res;
+      .then(res => {
+        let [tracks, mpdPlaylist, status = inputStatus] = res;
         if (!tracks.length) return Promise.reject('Playlist empty!');
         let startTime;
 
@@ -236,11 +281,8 @@ module.exports = function(Playlist) {
           default:
             startTime = new Date();
         }
-        tracks.reduce((prev, track) => {
-          if (prev.index !== track.index - 1) track.setIndex(prev);
-          return track;
-        }, {
-          index: -1
+        tracks.map(track => {
+          // track.checkIndex(mpdPlaylist) ?
         });
         let orderedPlaylsit = [
           ...tracks.slice(status.song || 0),
@@ -306,7 +348,9 @@ module.exports = function(Playlist) {
       where: ctx.where
     })
       .then(ptracks => {
-        return Promise.all(ptracks.map(ptrack => Player.deleteTrack(ptrack.index)));
+        return Promise.all(
+          ptracks.map(ptrack => Player.deleteTrack(ptrack.index))
+        );
       })
       .then(res => {
         next();

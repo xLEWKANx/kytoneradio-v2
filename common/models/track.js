@@ -4,6 +4,7 @@ const mm = require('musicmetadata');
 const fs = require('fs');
 const path = require('path');
 const debug = require('debug');
+const createPromiseCallback = require('../../lib/utils').createPromiseCallback;
 
 const log = debug('player:Track');
 const MUSIC_EXTENTION_REGEXP = /.mp3$/;
@@ -154,6 +155,8 @@ module.exports = function(Track) {
   };
 
   Track.prototype.addToPlaylist = function(cb) {
+    cb = cb || createPromiseCallback();
+
     let Player = Track.app.models.Player;
     let Playlist = Track.app.models.Playlist;
 
@@ -161,8 +164,30 @@ module.exports = function(Track) {
       .then(() => {
         return Playlist.add(this);
       })
-      .then((track) => cb(null, track))
+      .then(track => cb(null, track))
       .catch(cb);
+
+    return cb.promise;
+  };
+
+  Track.addAll = function(trackNames, cb) {
+    cb = cb || createPromiseCallback();
+
+    Track.find({
+      where: {
+        name: {
+          inq: trackNames
+        }
+      }
+    }).tap(log)
+      .mapSeries(track => {
+        console.log('track', track);
+        return track.addToPlaylist();
+      })
+      .then(ptracks => cb(null, ptracks))
+      .catch(cb);
+
+    return cb.promise;
   };
 
   Promise.promisifyAll(Track, { suffix: 'Promised' });

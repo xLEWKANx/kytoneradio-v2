@@ -12,6 +12,7 @@ describe('Playlist test', () => {
   let app = require('../server/server');
   let Playlist = app.models.Playlist;
   let Player = app.models.Player;
+  let Track = app.models.Track;
 
   app.io = new EventEmitter();
 
@@ -22,6 +23,7 @@ describe('Playlist test', () => {
   let db = app.loopback.createDataSource('db', { connector: 'memory' });
 
   Playlist.attachTo(db);
+  Track.attachTo(db);
 
   Player.getStatus = function(cb) {
     cb = cb || ((err, res) => Promise.resolve(res));
@@ -45,9 +47,17 @@ describe('Playlist test', () => {
 
   beforeEach(done => {
     Playlist.createFakeTracks(4, undefined, (err, tracks) => {
+      if (err) return done(err);
       playlist = tracks;
       done();
     });
+  });
+
+  afterEach(done => {
+    if (clock) clock.restore();
+    Playlist.destroyAll({}, { skip: true }).then((info) => {
+      done();
+    }).catch(done);
   });
 
   it('it should calculate playlist time from prev', done => {
@@ -81,6 +91,12 @@ describe('Playlist test', () => {
     let startTime = moment('12-00', 'HH-mm').toDate();
     let endTime = Playlist.addSecond(startTime, -30 * 60);
     expect(moment(endTime).format('HH-mm')).to.be.equal('11-30');
+  });
+
+  it('should properly add seconds to Date', () => {
+    Playlist.destroyAll({}, { skip: true }).then((info) => {
+      return Playlist.resetPlaylist();
+    }).then();
   });
 
   it('track after play must go to end of queue', done => {
@@ -194,11 +210,4 @@ describe('Playlist test', () => {
   //     });
   //   }, time);
   // });
-
-  afterEach(done => {
-    if (clock) clock.restore();
-    Playlist.destroyAll({}, { skip: true }).then((info) => {
-      done();
-    });
-  });
 });

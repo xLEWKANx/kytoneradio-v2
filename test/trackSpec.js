@@ -1,44 +1,62 @@
 /* eslint-env jasmine, node */
+const _ = require('lodash');
+const chai = require('chai');
+const expect = chai.expect;
+chai.use(require('chai-datetime'));
 
 describe('Track test', () => {
+  let Promise = require('bluebird');
+  let app = require('../server/server');
+  let Playlist = app.models.Playlist;
+  let Player = app.models.Player;
+  let Track = app.models.Track;
 
-  let Promise = require('bluebird')
-  let moment = require('moment')
-  let app = require('../server/server')
-  let Playlist = app.models.Playlist
-  let Track = app.models.Track
+  let db = app.loopback.createDataSource('db', { connector: 'memory' });
 
-  let db = app.loopback.createDataSource('db', { connector: 'memory' })
+  Playlist.attachTo(db);
+  Track.attachTo(db);
+  let playlist, tracks;
+  Player.getStatus = function(cb) {
+    cb = cb || ((err, res) => Promise.resolve(res));
 
-  Track.attachTo(db)
-  Playlist.attachTo(db)
+    return cb(null, { elapsed: 0 });
+  };
 
-  const TRACK_DURATION = 2 * 60 * 60
-  const TRACK_START = new Date()
-  const TRACK_END = Playlist.addSecond(TRACK_START, TRACK_DURATION)
+  Player.deleteTrack = function(name, cb) {
+    cb = cb || ((err, res) => Promise.resolve(res));
 
-  const MOCK_TRACK = new Track({
-    id: 0,
-    name: 'test track',
-    processed: true,
-    duration: TRACK_DURATION
-  })
+    return cb(null);
+  };
 
-  let MOCK_PLAYLIST_TRACK = new Playlist({
-    id: 0,
-    name: 'test playlist track',
-    startTime: TRACK_START,
-    endTime: TRACK_END,
-    duration: TRACK_DURATION,
-    trackId: 0,
-    index: 0
-  })
-  MOCK_PLAYLIST_TRACK.track(MOCK_TRACK)
+  Player.addTrack = function(name, cb) {
+    if (!cb) return Promise.resolve();
+    return cb(null, true);
+  };
 
-  let simplifyTime = function (date) {
-    return moment(Date.parse(date)).format("YYYY-MM-DD HH-mm")
-  }
+  beforeEach(done => {
+    Playlist.createFakeTracks(4, undefined, (err, ptracks) => {
+      if (err) return done(err);
+      playlist = ptracks;
 
- 
+      return Track.find({})
+        .then(tr => {
+          tracks = tr;
+          return done();
+        })
+        .catch(done);
+    });
+  });
 
-})
+  it('Should add all tracks to playlist by track names', (done) => {
+    Playlist.destroyAll({}, { skip: true }).then((info) => {
+      let trackNames = tracks.map(track => track.name);
+      Track.addAll(trackNames).then((ptracks) => {
+        expect(ptracks[0]).to.be.an.instanceof(Playlist);
+        return Playlist.find({});
+      }).then((ptracks) => {
+        expect(ptracks.length).to.be.equal(5);
+        done();
+      });
+    }).catch(done);
+  });
+});

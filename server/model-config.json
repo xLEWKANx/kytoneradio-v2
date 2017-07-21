@@ -13,8 +13,9 @@
       "./mixins"
     ]
   },
-  "User": {
-    "dataSource": "db"
+  "user": {
+    "dataSource": "db",
+    "public": true
   },
   "AccessToken": {
     "dataSource": "db",

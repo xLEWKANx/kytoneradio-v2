@@ -24,6 +24,7 @@ module.exports = function(Player) {
 
     client.on('error', err => {
       console.error('mpd error: ', err);
+      return cb(err);
     });
 
     client.on('ready', () => {

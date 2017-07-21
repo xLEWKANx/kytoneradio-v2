@@ -1,7 +1,7 @@
 import { fetchJson, queryParams } from '../utils/fetch';
 
 const api = 'http://localhost:3027/api';
-class User {
+class user {
   constructor(model) {
     Object.assign(this, model);
   }
@@ -10,7 +10,7 @@ class User {
   static baseUrl() {
     return `${this.api}${this.resource}`;
   }
-  static resource = '/Users';
+  static resource = '/users';
 
   static fetch(url, options) {
     return fetchJson(url, options).then(
@@ -42,6 +42,64 @@ class User {
     return this.constructor.fetch(url, {
       method: 'PUT',
       body: JSON.stringify(body)
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
+  __findById__roles(fk) {
+    let url = `${this.constructor.baseUrl()}/${this.id}/roles/${fk}`;
+    return this.constructor.fetch(url, {
+      method: 'GET',
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
+  __destroyById__roles(fk) {
+    let url = `${this.constructor.baseUrl()}/${this.id}/roles/${fk}`;
+    return this.constructor.fetch(url, {
+      method: 'DELETE',
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
+  __updateById__roles(fk, data) {
+    let url = `${this.constructor.baseUrl()}/${this.id}/roles/${fk}`;
+    let body = data;
+    return this.constructor.fetch(url, {
+      method: 'PUT',
+      body: JSON.stringify(body)
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
+  __link__roles(fk, data) {
+    let url = `${this.constructor.baseUrl()}/${this.id}/roles/rel/${fk}`;
+    let body = data;
+    return this.constructor.fetch(url, {
+      method: 'PUT',
+      body: JSON.stringify(body)
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
+  __unlink__roles(fk) {
+    let url = `${this.constructor.baseUrl()}/${this.id}/roles/rel/${fk}`;
+    return this.constructor.fetch(url, {
+      method: 'DELETE',
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
+  __exists__roles(fk) {
+    let url = `${this.constructor.baseUrl()}/${this.id}/roles/rel/${fk}`;
+    return this.constructor.fetch(url, {
+      method: 'HEAD',
     }).then(res => {
       return res;
     }).catch(err => Promise.reject(err));
@@ -85,6 +143,44 @@ class User {
     }).catch(err => Promise.reject(err));
   }
 
+  __get__roles(filter) {
+    let url = `${this.constructor.baseUrl()}/${this.id}/roles${queryParams({ filter })}`;
+    return this.constructor.fetch(url, {
+      method: 'GET',
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
+  __create__roles(data) {
+    let url = `${this.constructor.baseUrl()}/${this.id}/roles`;
+    let body = data;
+    return this.constructor.fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(body)
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
+  __delete__roles() {
+    let url = `${this.constructor.baseUrl()}/${this.id}/roles`;
+    return this.constructor.fetch(url, {
+      method: 'DELETE',
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
+  __count__roles(where) {
+    let url = `${this.constructor.baseUrl()}/${this.id}/roles/count${queryParams({ where })}`;
+    return this.constructor.fetch(url, {
+      method: 'GET',
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
   static create(data) {
     let url = `${this.baseUrl()}/`;
     let body = data;
@@ -92,7 +188,7 @@ class User {
       method: 'POST',
       body: JSON.stringify(body)
     }).then(res => {
-      return new User(res);
+      return new user(res);
     }).catch(err => Promise.reject(err));
   }
 
@@ -103,7 +199,7 @@ class User {
       method: 'PATCH',
       body: JSON.stringify(body)
     }).then(res => {
-      return new User(res);
+      return new user(res);
     }).catch(err => Promise.reject(err));
   }
 
@@ -114,7 +210,7 @@ class User {
       method: 'POST',
       body: JSON.stringify(body)
     }).then(res => {
-      return new User(res);
+      return new user(res);
     }).catch(err => Promise.reject(err));
   }
 
@@ -125,7 +221,7 @@ class User {
       method: 'POST',
       body: JSON.stringify(body)
     }).then(res => {
-      return new User(res);
+      return new user(res);
     }).catch(err => Promise.reject(err));
   }
 
@@ -143,7 +239,7 @@ class User {
     return this.fetch(url, {
       method: 'GET',
     }).then(res => {
-      return new User(res);
+      return new user(res);
     }).catch(err => Promise.reject(err));
   }
 
@@ -154,7 +250,7 @@ class User {
       method: 'POST',
       body: JSON.stringify(body)
     }).then(res => {
-      return new User(res);
+      return new user(res);
     }).catch(err => Promise.reject(err));
   }
 
@@ -163,7 +259,7 @@ class User {
     return this.fetch(url, {
       method: 'GET',
     }).then(res => {
-      return res.map(i => new User(i));
+      return res.map(i => new user(i));
     }).catch(err => Promise.reject(err));
   }
 
@@ -172,7 +268,7 @@ class User {
     return this.fetch(url, {
       method: 'GET',
     }).then(res => {
-      return new User(res);
+      return new user(res);
     }).catch(err => Promise.reject(err));
   }
 
@@ -212,7 +308,7 @@ class User {
       method: 'PATCH',
       body: JSON.stringify(body)
     }).then(res => {
-      return new User(res);
+      return new user(res);
     }).catch(err => Promise.reject(err));
   }
 
@@ -297,4 +393,4 @@ class User {
 
 }
 
-export default User;
+export default user;

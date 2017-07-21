@@ -11,95 +11,96 @@ class musicStorage {
     return `${this.api}${this.resource}`;
   }
   static resource = '/musicStorages';
-  
+
   static fetch(url, options) {
     return fetchJson(url, options).then(
       ({ status, headers, body, json }) => json
     );
   }
 
-  static getContainers() { 
+  static getContainers() {
     let url = `${this.baseUrl()}/`;
     return this.fetch(url, {
       method: 'GET',
     }).then(res => {
       return res;
-    }).catch(err => Promise.reject(err))
+    }).catch(err => Promise.reject(err));
   }
-  
-  static createContainer(options) { 
+
+  static createContainer(options) {
     let url = `${this.baseUrl()}/`;
     let body = options;
     return this.fetch(url, {
       method: 'POST',
-      body: JSON.stringify(body) 
+      body: JSON.stringify(body)
     }).then(res => {
       return res;
-    }).catch(err => Promise.reject(err))
+    }).catch(err => Promise.reject(err));
   }
-  
-  static destroyContainer(container) { 
+
+  static destroyContainer(container) {
     let url = `${this.baseUrl()}/${container}`;
     return this.fetch(url, {
       method: 'DELETE',
     }).then(res => {
       return res;
-    }).catch(err => Promise.reject(err))
+    }).catch(err => Promise.reject(err));
   }
-  
-  static getContainer(container) { 
+
+  static getContainer(container) {
     let url = `${this.baseUrl()}/${container}`;
     return this.fetch(url, {
       method: 'GET',
     }).then(res => {
       return res;
-    }).catch(err => Promise.reject(err))
+    }).catch(err => Promise.reject(err));
   }
-  
-  static getFiles(container) { 
+
+  static getFiles(container) {
     let url = `${this.baseUrl()}/${container}/files`;
     return this.fetch(url, {
       method: 'GET',
     }).then(res => {
       return res;
-    }).catch(err => Promise.reject(err))
+    }).catch(err => Promise.reject(err));
   }
-  
-  static getFile(container, file) { 
+
+  static getFile(container, file) {
     let url = `${this.baseUrl()}/${container}/files/${file}`;
     return this.fetch(url, {
       method: 'GET',
     }).then(res => {
       return res;
-    }).catch(err => Promise.reject(err))
+    }).catch(err => Promise.reject(err));
   }
-  
-  static removeFile(container, file) { 
+
+  static removeFile(container, file) {
     let url = `${this.baseUrl()}/${container}/files/${file}`;
     return this.fetch(url, {
       method: 'DELETE',
     }).then(res => {
       return res;
-    }).catch(err => Promise.reject(err))
+    }).catch(err => Promise.reject(err));
   }
-  
-  static upload() { 
+
+  static upload() {
     let url = `${this.baseUrl()}/${this.container}/upload`;
     return this.fetch(url, {
       method: 'POST',
     }).then(res => {
       return res;
-    }).catch(err => Promise.reject(err))
+    }).catch(err => Promise.reject(err));
   }
-  
-  static download(container, file) { 
+
+  static download(container, file) {
     let url = `${this.baseUrl()}/${container}/download/${file}`;
     return this.fetch(url, {
       method: 'GET',
     }).then(res => {
       return res;
-    }).catch(err => Promise.reject(err))
+    }).catch(err => Promise.reject(err));
   }
-  }
+
+}
 
 export default musicStorage;

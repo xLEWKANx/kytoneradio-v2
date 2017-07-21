@@ -1,4 +1,4 @@
-export { default as User } from './lib/User';
+export { default as user } from './lib/user';
 export { default as Note } from './lib/Note';
 export { default as Player } from './lib/Player';
 export { default as Playlist } from './lib/Playlist';

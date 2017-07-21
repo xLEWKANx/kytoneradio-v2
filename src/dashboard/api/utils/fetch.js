@@ -13,7 +13,7 @@ export const fetchJson = (url, options = {}) => {
   let token = storage.load('lbtoken');
 
   if (token.id) {
-    requestHeaders.set('Authorization', token);
+    requestHeaders.set('Authorization', token.id);
   }
 
   return fetch(url, { ...options, headers: requestHeaders })

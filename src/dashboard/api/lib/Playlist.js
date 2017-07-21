@@ -205,10 +205,11 @@ class Playlist {
     }).catch(err => Promise.reject(err));
   }
 
-  static updatePlaylist() {
-    let url = `${this.baseUrl()}/updatePlaylist`;
+  static updatePlaylist(status) {
+    let url = `${this.baseUrl()}/updatePlaylist`;    let body = { status };
     return this.fetch(url, {
       method: 'POST',
+      body: JSON.stringify(body)
     }).then(res => {
       return res;
     }).catch(err => Promise.reject(err));

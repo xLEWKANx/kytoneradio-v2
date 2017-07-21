@@ -30,6 +30,8 @@ module.exports = function(Player) {
     client.on('ready', () => {
       cb(null, client);
     });
+
+    Promise.promisifyAll(client, { suffix: 'Async' });
   };
 
   Player.play = function(index, cb) {
@@ -40,19 +42,20 @@ module.exports = function(Player) {
     cb = cb || createPromiseCallback();
 
     let arg = index === undefined ? [] : [index];
-    Player.getStatus().then(status => {
-      if (status.state === 'play' && status.song == index) {
-        return cb(null, status);
-      } else {
-        client.sendCommand(mpd.cmd('play', arg), (err, msg) => {
-          if (err) return cb(err);
-          Player.log({
-            command: 'play'
-          }).then((log) => Player.getStatus(cb));
-        });
-      }
-    })
-    .catch(cb);
+    Player.getStatus()
+      .then(status => {
+        if (status.state === 'play' && status.song == index) {
+          return cb(null, status);
+        } else {
+          client.sendCommand(mpd.cmd('play', arg), (err, msg) => {
+            if (err) return cb(err);
+            Player.log({
+              command: 'play'
+            }).then(log => Player.getStatus(cb));
+          });
+        }
+      })
+      .catch(cb);
 
     return cb.promise;
   };
@@ -90,18 +93,23 @@ module.exports = function(Player) {
   });
 
   Player.addTrack = function(name, cb) {
+    cb = cb || createPromiseCallback();
     console.log('add track', name);
-    client.sendCommand(mpd.cmd('add', [name]), (err, msg) => {
-      if (err) return cb(err);
-      log(`Added ${name} to MPD playlist`, err, msg);
-      Player.log(
-        {
-          command: 'play',
-          messange: name
-        },
-        cb
-      );
-    });
+    client
+      .sendCommandAsync(mpd.cmd('add', [name]))
+      .then(msg => {
+        console.log('add track', name);
+        return Player.log(
+          {
+            command: 'add',
+            messange: name
+          },
+          cb
+        );
+      })
+      .catch(cb);
+
+    return cb.promise;
   };
 
   Player.getCurrentPlaylist = function(cb) {
@@ -148,8 +156,8 @@ module.exports = function(Player) {
     return cb.promise;
   };
 
-  Player.moveTrack = function(require, to, cb) {
-    client.sendCommand(mpd.cmd('move', [require, to]), (err, msg) => {
+  Player.moveTrack = function(from, to, cb) {
+    client.sendCommand(mpd.cmd('move', [from, to]), (err, msg) => {
       if (err) return cb(err);
       return cb(null, msg);
     });
@@ -164,6 +172,28 @@ module.exports = function(Player) {
     });
 
     return cb.promise;
+  };
+
+  Player.playlist = function(cb) {
+    cb = cb || createPromiseCallback();
+    client.sendCommand(mpd.cmd('playlist', []), (err, msg) => {
+      if (err) return cb(err);
+      if (msg) msg = mpd.parseKeyValueMessage(msg);
+
+      return cb(null, msg || {});
+    });
+
+    return cb.promise;
+  };
+
+  Player.parsePlaylist = function(mpdPlaylist) {
+    let playlist = {};
+    const INDEX_REGEXP = /^\d+/;
+    for (let key in mpdPlaylist) {
+      let pkey = key.match(INDEX_REGEXP);
+      playlist[pkey] = mpdPlaylist[key];
+    }
+    return playlist;
   };
 
   Player.remoteMethod('getStatus', {

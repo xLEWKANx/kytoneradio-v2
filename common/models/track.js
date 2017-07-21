@@ -157,11 +157,11 @@ module.exports = function(Track) {
     let Player = Track.app.models.Player;
     let Playlist = Track.app.models.Playlist;
 
-    Playlist.add(this)
-      .then(playlistTrack => {
-        return Player.addTrackPromised(this.name).then(() => playlistTrack);
+    Player.addTrack(this.name)
+      .then(() => {
+        return Playlist.add(this);
       })
-      .then(playlistTrack => cb(null, playlistTrack))
+      .then((track) => cb(null, track))
       .catch(cb);
   };
 

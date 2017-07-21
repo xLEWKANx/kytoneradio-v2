@@ -239,6 +239,8 @@ module.exports = function(Playlist) {
         tracks.reduce((prev, track) => {
           if (prev.index !== track.index - 1) track.setIndex(prev);
           return track;
+        }, {
+          index: -1
         });
         let orderedPlaylsit = [
           ...tracks.slice(status.song || 0),
@@ -255,10 +257,10 @@ module.exports = function(Playlist) {
           return track;
         }, startValues);
 
-        return orderedPlaylsit;
+        return orderedPlaylsit.reverse();
       })
       .map(track => track.save())
-      .then(tracks => cb(null, tracks))
+      .then(tracks => cb(null, tracks.reverse()))
       .catch(cb);
 
     return cb.promise;
@@ -346,7 +348,7 @@ module.exports = function(Playlist) {
       })
       .then(tracks => {
         if (!tracks.length) return cb('Playlist empty');
-
+        log('Playlist.play | playing', tracks[0]);
         return tracks[0].play().then(track => cb(null, tracks[0]));
       })
       .catch(cb);

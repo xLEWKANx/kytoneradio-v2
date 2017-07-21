@@ -5698,9 +5698,9 @@ loopback-swagger@^3.0.1:
     strong-globalize "^2.6.0"
     underscore.string "~2.3.3"
 
-loopback@^3.8.0:
-  version "3.8.0"
-  resolved "https://registry.yarnpkg.com/loopback/-/loopback-3.8.0.tgz#7d73e7bee246f60b781f8b8b4bf0a26ec23b1ded"
+loopback@^3.9.0:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/loopback/-/loopback-3.9.0.tgz#e99a0bc93e9a13d1144cae69ae22dad34950366e"
   dependencies:
     async "^2.0.1"
     bcryptjs "^2.1.0"

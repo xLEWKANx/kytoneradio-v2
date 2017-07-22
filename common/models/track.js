@@ -122,7 +122,6 @@ module.exports = function(Track) {
       })
       .then(files => {
         return Player.updateDatabasePromised().then(msg => {
-          console.log(msg);
           return files;
         });
       })
@@ -182,7 +181,6 @@ module.exports = function(Track) {
       }
     }).tap(log)
       .mapSeries(track => {
-        console.log('track', track);
         return track.addToPlaylist();
       })
       .then(ptracks => cb(null, ptracks))

@@ -94,11 +94,9 @@ module.exports = function(Player) {
 
   Player.addTrack = function(name, cb) {
     cb = cb || createPromiseCallback();
-    console.log('add track', name);
     client
       .sendCommandAsync(mpd.cmd('add', [name]))
       .then(msg => {
-        console.log('add track', name);
         return Player.log(
           {
             command: 'add',

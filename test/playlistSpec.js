@@ -37,6 +37,18 @@ describe('Playlist test', () => {
     return cb(null);
   };
 
+  Player.playlist = function(cb) {
+    let indexes = {
+      '0': 'test track 0',
+      '1': 'test track 1',
+      '2': 'test track 2',
+      '3': 'test track 3',
+      '4': 'test track 4'
+    };
+    cb = cb || ((err, res) => Promise.resolve(indexes));
+    return cb(null, indexes);
+  };
+
   let simplifyTime = function(date) {
     return moment(Date.parse(date)).format('YYYY-MM-DD HH-mm');
   };
@@ -55,9 +67,11 @@ describe('Playlist test', () => {
 
   afterEach(done => {
     if (clock) clock.restore();
-    Playlist.destroyAll({}, { skip: true }).then((info) => {
-      done();
-    }).catch(done);
+    Playlist.destroyAll({}, { skip: true })
+      .then(info => {
+        done();
+      })
+      .catch(done);
   });
 
   it('it should calculate playlist time from prev', done => {
@@ -93,10 +107,40 @@ describe('Playlist test', () => {
     expect(moment(endTime).format('HH-mm')).to.be.equal('11-30');
   });
 
-  it('should properly add seconds to Date', () => {
-    Playlist.destroyAll({}, { skip: true }).then((info) => {
-      return Playlist.resetPlaylist();
-    }).then();
+  it('checkIndex', done => {
+    playlist[0].index = 10;
+    playlist[0]
+      .save()
+      .then(track => {
+        return Playlist.checkIndex();
+      })
+      .catch(err => {
+        expect(err).to.be.instanceof(Error);
+        playlist[0].index = 0;
+        return playlist[0].save().then(() => Playlist.checkIndex());
+      })
+      .then(isCorrect => {
+        expect(isCorrect).to.be.true;
+        return playlist[0].destroy().then(() => Playlist.checkIndex());
+      })
+      .catch(err => {
+        expect(err).to.be.instanceof(Error);
+        done();
+      })
+      .catch(done);
+  });
+
+  it('should reset playlist from mpd tracks', done => {
+    Playlist.destroyAll({}, { skip: true })
+      .then(info => {
+        return Playlist.resetPlaylist();
+      })
+      .then(playlist => {
+        expect(playlist.length).to.be.equal(5);
+        expect(playlist[0].index).to.be.equal(0);
+        expect(playlist[0].name).to.be.equal('test track 0');
+      })
+      .catch(done);
   });
 
   it('track after play must go to end of queue', done => {
@@ -114,25 +158,27 @@ describe('Playlist test', () => {
       return cb(null, 2);
     };
 
-    playlist[0].moveToEnd().then(() => playlist[1].moveToEnd())
+    playlist[0]
+      .moveToEnd()
+      .then(() => playlist[1].moveToEnd())
       .then(() => {
         return Playlist.tracksByOrder();
-      }).then((playlist) => {
+      })
+      .then(playlist => {
         expect(playlist[0].index).to.be.equal(2);
         done();
       })
-      .catch((err) => expect(err).not.to.be.ok);
+      .catch(err => expect(err).not.to.be.ok);
   });
 
   it('should update time for all tracks starts from playing', done => {
-    console.log('playlist', playlist);
     Player.playlist = function(cb) {
       return cb(null, {
         '0': 'test track 0',
         '1': 'test track 1',
         '2': 'test track 2',
         '3': 'test track 3',
-        '4': 'test track 4',
+        '4': 'test track 4'
       });
     };
 
@@ -145,25 +191,28 @@ describe('Playlist test', () => {
     playlist[4].index = 6;
 
     Promise.all(playlist)
-    .map((track) => track.save())
-    .then(() => {
-      return Playlist.find({});
-    }).then(() => {
-      return Playlist.updatePlaylist({ elapsed: 120, state: 'play' });
-    }).then(tracks => {
-      let startTime = moment.utc().add(-120, 'second').format('HH:mm:ss');
-      expect(tracks[0].simplifyTime().startTime).to.be.equal(startTime);
-      tracks.reduce((prev, track, i) => {
-        let prevS = prev.simplifyTime();
-        let trackS = track.simplifyTime();
-        expect(track.index).to.be.equal(i);
-        expect(prevS.endTime).to.be.equal(trackS.startTime);
-        return track;
+      .map(track => track.save())
+      .then(() => {
+        return Playlist.find({});
+      })
+      .then(() => {
+        return Playlist.updatePlaylist({ elapsed: 120, state: 'play' });
+      })
+      .then(tracks => {
+        let startTime = moment.utc().add(-120, 'second').format('HH:mm:ss');
+        expect(tracks[0].simplifyTime().startTime).to.be.equal(startTime);
+        tracks.reduce((prev, track, i) => {
+          let prevS = prev.simplifyTime();
+          let trackS = track.simplifyTime();
+          expect(track.index).to.be.equal(i);
+          expect(prevS.endTime).to.be.equal(trackS.startTime);
+          return track;
+        });
+        done();
+      })
+      .catch(err => {
+        expect(err).not.to.be.ok;
       });
-      done();
-    }).catch(err => {
-      expect(err).not.to.be.ok;
-    });
   });
 
   it('should calculate time after delete tracks', done => {

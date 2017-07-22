@@ -393,6 +393,32 @@ module.exports = function(Playlist) {
     }
   });
 
+  Playlist.moveTrack = function(fromIndex, toIndex, cb) {
+    cb = cb || createPromiseCallback();
+    const Player = Playlist.app.models.Player;
+    Player.moveTrack(fromIndex, toIndex).then(() => {
+      return Playlist.updatePlaylist();
+    }).then(tracks => cb(null, tracks))
+    .catch(cb);
+
+    return cb.promise;
+  };
+
+  Playlist.remoteMethod('moveTrack', {
+    accepts: [{
+      arg: 'fromIndex',
+      type: 'number'
+    }, {
+      arg: 'toIndex',
+      type: 'number'
+    }],
+    returns: {
+      arg: 'tracks',
+      type: 'array',
+      root: true
+    }
+  });
+
   Playlist.deleteTracks = function(indexes, cb) {
     cb = cb || createPromiseCallback();
 

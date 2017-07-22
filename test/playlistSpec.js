@@ -139,6 +139,25 @@ describe('Playlist test', () => {
     });
   });
 
+  it('move tracks Playlist.move(from, to)', done => {
+    Player.playlist = function(cb) {
+      let indexes = {
+        '1': 'test track 0',
+        '0': 'test track 1',
+        '2': 'test track 2',
+        '3': 'test track 3',
+        '4': 'test track 4'
+      };
+      cb = cb || ((err, res) => Promise.resolve(indexes));
+      return cb(null, indexes);
+    };
+    Playlist.moveTrack(0, 1).then((tracks) => {
+      expect(tracks[0].name).to.be.equal('test track 1');
+      expect(tracks[1].name).to.be.equal('test track 0');
+      done();
+    }).catch(done);
+  });
+
   it('should return playlist by playing order depents on order and index', done => {
     Player.currentTrackIndex = function(cb) {
       cb = cb || (() => Promise.resolve(2));

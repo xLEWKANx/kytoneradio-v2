@@ -155,10 +155,14 @@ module.exports = function(Player) {
   };
 
   Player.moveTrack = function(from, to, cb) {
+    cb = cb || createPromiseCallback();
+
     client.sendCommand(mpd.cmd('move', [from, to]), (err, msg) => {
       if (err) return cb(err);
       return cb(null, msg);
     });
+
+    return cb.promise;
   };
 
   Player.getStatus = function(cb) {

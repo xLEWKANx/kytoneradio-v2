@@ -100,10 +100,13 @@ class Datagrid extends Component {
       bodyOptions,
       rowOptions
     } = this.props;
+    let table = null;
     return (
       <Table
         style={options && options.fixedHeader ? null : styles.table}
         fixedHeader={false}
+
+        table={table}
         {...options}
       >
         <TableHeader
@@ -130,6 +133,7 @@ class Datagrid extends Component {
           </TableRow>
         </TableHeader>
         <DatagridBody
+          muiTheme={muiTheme}
           resource={resource}
           ids={ids}
           data={data}

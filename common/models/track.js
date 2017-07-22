@@ -64,6 +64,7 @@ module.exports = function(Track) {
 
   Track.beforeRemote('deleteById', (ctx, instance, next) => {
     if (ctx.options.skip) return next();
+
     log('after remote | ctx', _.keys(ctx));
     let Storage = Track.app.models.musicStorage;
     let id = ctx.args.id;
@@ -72,20 +73,20 @@ module.exports = function(Track) {
     })
       .then(track => {
         log('track to delete', track);
+        if (!fs.existsSync(track.path)) return next();
+
         let length;
         if (track.playlist()) {
           length = track.playlist().length;
-        } else {
-          return next();
         }
-        if (length)
+
+        if (length) {
           return Promise.reject(
             next(new Error(`${length} tracks in playlist, delete first`))
           );
-        else return track;
-      })
-      .then(track => {
-        return Storage.removeFilePromised('music', track.name);
+        } else {
+          return Storage.removeFilePromised('music', track.name);
+        }
       })
       .then(() => next())
       .catch(next);

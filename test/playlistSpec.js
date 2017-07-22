@@ -69,6 +69,9 @@ describe('Playlist test', () => {
     if (clock) clock.restore();
     Playlist.destroyAll({}, { skip: true })
       .then(info => {
+        return Track.destroyAll({}, { skip: true });
+      })
+      .then(info => {
         done();
       })
       .catch(done);
@@ -107,38 +110,22 @@ describe('Playlist test', () => {
     expect(moment(endTime).format('HH-mm')).to.be.equal('11-30');
   });
 
-  it('checkIndex', done => {
-    playlist[0].index = 10;
-    playlist[0]
-      .save()
-      .then(track => {
-        return Playlist.checkIndex();
-      })
-      .catch(err => {
-        expect(err).to.be.instanceof(Error);
-        playlist[0].index = 0;
-        return playlist[0].save().then(() => Playlist.checkIndex());
-      })
-      .then(isCorrect => {
-        expect(isCorrect).to.be.true;
-        return playlist[0].destroy().then(() => Playlist.checkIndex());
-      })
-      .catch(err => {
-        expect(err).to.be.instanceof(Error);
-        done();
-      })
-      .catch(done);
-  });
-
   it('should reset playlist from mpd tracks', done => {
     Playlist.destroyAll({}, { skip: true })
       .then(info => {
-        return Playlist.resetPlaylist();
+        return Playlist.resetPlaylist({
+          '0': 'test track 0',
+          '1': 'test track 1',
+          '2': 'test track 2',
+          '3': 'test track 3',
+          '4': 'test track 4'
+        });
       })
       .then(playlist => {
         expect(playlist.length).to.be.equal(5);
         expect(playlist[0].index).to.be.equal(0);
         expect(playlist[0].name).to.be.equal('test track 0');
+        done();
       })
       .catch(done);
   });
@@ -172,16 +159,6 @@ describe('Playlist test', () => {
   });
 
   it('should update time for all tracks starts from playing', done => {
-    Player.playlist = function(cb) {
-      return cb(null, {
-        '0': 'test track 0',
-        '1': 'test track 1',
-        '2': 'test track 2',
-        '3': 'test track 3',
-        '4': 'test track 4'
-      });
-    };
-
     playlist[1].startTime = new Date();
     playlist[1].endTime = new Date();
 
@@ -210,12 +187,20 @@ describe('Playlist test', () => {
         });
         done();
       })
-      .catch(err => {
-        expect(err).not.to.be.ok;
-      });
+      .catch(done);
   });
 
   it('should calculate time after delete tracks', done => {
+    Player.playlist = function(cb) {
+      let indexes = {
+        '0': 'test track 0',
+        '1': 'test track 1',
+        '4': 'test track 4'
+      };
+      cb = cb || ((err, res) => Promise.resolve(indexes));
+      return cb(null, indexes);
+    };
+
     Playlist.deleteTracks([2, 3])
       .then(() => {
         return Playlist.find({});
@@ -224,7 +209,8 @@ describe('Playlist test', () => {
         expect(tracks.length).to.be.equal(3);
         expect(tracks[2].index).to.be.equal(2);
         done();
-      });
+      })
+      .catch(done);
   });
 
   // it('should add listener to next track', done => {

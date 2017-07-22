@@ -179,7 +179,7 @@ module.exports = function(Track) {
           inq: trackNames
         }
       }
-    }).tap(log)
+    })
       .mapSeries(track => {
         return track.addToPlaylist();
       })

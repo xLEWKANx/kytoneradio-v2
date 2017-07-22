@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   List,
-  Datagrid,
   FunctionField,
   DateInput,
   TextField,
@@ -12,6 +11,7 @@ import {
   DeleteButton,
   Filter
 } from 'admin-on-rest';
+import Datagrid from '../aor-components/list/Datagrid';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
@@ -38,6 +38,13 @@ export const PlayList = props =>
       filters={<PlaylistFilter />} /* actions={<PostActions /> } */
     >
       <Datagrid>
+        <TextField source="index" label="index" style={{
+          maxWidth: 25,
+        }} />
+        <TextField source="order" label="order" style={{
+          maxWidth: 25,
+        }} />
+
         <FunctionField
           label="Start Time"
           render={record => moment(record.startTime).format('HH:mm:ss')}

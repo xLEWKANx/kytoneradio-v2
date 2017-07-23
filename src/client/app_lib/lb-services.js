@@ -60,7 +60,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
       'LoopBackResource', 'LoopBackAuth', '$injector', '$q',
       function(LoopBackResource, LoopBackAuth, $injector, $q) {
         var R = LoopBackResource(
-        urlBase + "/Users/:id",
+        urlBase + "/users/:id",
           { 'id': '@id' },
           {
 
@@ -75,7 +75,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `id` – `{*}` - User id
+             *  - `id` – `{*}` - user id
              *
              *  - `options` – `{object=}` -
              *
@@ -102,7 +102,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
               params: {
                 'fk': '@fk',
               },
-              url: urlBase + "/Users/:id/accessTokens/:fk",
+              url: urlBase + "/users/:id/accessTokens/:fk",
               method: "GET",
             },
 
@@ -117,7 +117,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `id` – `{*}` - User id
+             *  - `id` – `{*}` - user id
              *
              *  - `options` – `{object=}` -
              *
@@ -141,7 +141,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
               params: {
                 'fk': '@fk',
               },
-              url: urlBase + "/Users/:id/accessTokens/:fk",
+              url: urlBase + "/users/:id/accessTokens/:fk",
               method: "DELETE",
             },
 
@@ -156,7 +156,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `id` – `{*}` - User id
+             *  - `id` – `{*}` - user id
              *
              *  - `fk` – `{*}` - Foreign key for accessTokens
              *
@@ -187,8 +187,262 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
               params: {
                 'fk': '@fk',
               },
-              url: urlBase + "/Users/:id/accessTokens/:fk",
+              url: urlBase + "/users/:id/accessTokens/:fk",
               method: "PUT",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.User#prototype$__findById__roles
+             * @methodOf lbServices.User
+             *
+             * @description
+             *
+             * Find a related item by id for roles.
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *  - `id` – `{*}` - user id
+             *
+             *  - `options` – `{object=}` -
+             *
+             *  - `fk` – `{*}` - Foreign key for roles
+             *
+             *  - `options` – `{object=}` -
+             *
+             * @param {function(Object,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Object} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * <em>
+             * (The remote method definition does not provide any description.
+             * This usually means the response is a `User` object.)
+             * </em>
+             */
+            "prototype$__findById__roles": {
+              params: {
+                'fk': '@fk',
+              },
+              url: urlBase + "/users/:id/roles/:fk",
+              method: "GET",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.User#prototype$__destroyById__roles
+             * @methodOf lbServices.User
+             *
+             * @description
+             *
+             * Delete a related item by id for roles.
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *  - `id` – `{*}` - user id
+             *
+             *  - `options` – `{object=}` -
+             *
+             *  - `fk` – `{*}` - Foreign key for roles
+             *
+             *  - `options` – `{object=}` -
+             *
+             * @param {function(Object,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Object} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * This method returns no data.
+             */
+            "prototype$__destroyById__roles": {
+              params: {
+                'fk': '@fk',
+              },
+              url: urlBase + "/users/:id/roles/:fk",
+              method: "DELETE",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.User#prototype$__updateById__roles
+             * @methodOf lbServices.User
+             *
+             * @description
+             *
+             * Update a related item by id for roles.
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *  - `id` – `{*}` - user id
+             *
+             *  - `fk` – `{*}` - Foreign key for roles
+             *
+             * @param {Object} postData Request data.
+             *
+             *  - `options` – `{object=}` -
+             *
+             *  - `data` – `{object=}` -
+             *
+             *  - `options` – `{object=}` -
+             *
+             * @param {function(Object,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Object} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * <em>
+             * (The remote method definition does not provide any description.
+             * This usually means the response is a `User` object.)
+             * </em>
+             */
+            "prototype$__updateById__roles": {
+              params: {
+                'fk': '@fk',
+              },
+              url: urlBase + "/users/:id/roles/:fk",
+              method: "PUT",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.User#prototype$__link__roles
+             * @methodOf lbServices.User
+             *
+             * @description
+             *
+             * Add a related item by id for roles.
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *  - `id` – `{*}` - user id
+             *
+             *  - `fk` – `{*}` - Foreign key for roles
+             *
+             * @param {Object} postData Request data.
+             *
+             *  - `options` – `{object=}` -
+             *
+             *  - `data` – `{object=}` -
+             *
+             *  - `options` – `{object=}` -
+             *
+             * @param {function(Object,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Object} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * <em>
+             * (The remote method definition does not provide any description.
+             * This usually means the response is a `User` object.)
+             * </em>
+             */
+            "prototype$__link__roles": {
+              params: {
+                'fk': '@fk',
+              },
+              url: urlBase + "/users/:id/roles/rel/:fk",
+              method: "PUT",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.User#prototype$__unlink__roles
+             * @methodOf lbServices.User
+             *
+             * @description
+             *
+             * Remove the roles relation to an item by id.
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *  - `id` – `{*}` - user id
+             *
+             *  - `options` – `{object=}` -
+             *
+             *  - `fk` – `{*}` - Foreign key for roles
+             *
+             *  - `options` – `{object=}` -
+             *
+             * @param {function(Object,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Object} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * This method returns no data.
+             */
+            "prototype$__unlink__roles": {
+              params: {
+                'fk': '@fk',
+              },
+              url: urlBase + "/users/:id/roles/rel/:fk",
+              method: "DELETE",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.User#prototype$__exists__roles
+             * @methodOf lbServices.User
+             *
+             * @description
+             *
+             * Check the existence of roles relation to an item by id.
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *  - `id` – `{*}` - user id
+             *
+             *  - `options` – `{object=}` -
+             *
+             *  - `fk` – `{*}` - Foreign key for roles
+             *
+             *  - `options` – `{object=}` -
+             *
+             * @param {function(Object,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Object} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * <em>
+             * (The remote method definition does not provide any description.
+             * This usually means the response is a `User` object.)
+             * </em>
+             */
+            "prototype$__exists__roles": {
+              params: {
+                'fk': '@fk',
+              },
+              url: urlBase + "/users/:id/roles/rel/:fk",
+              method: "HEAD",
             },
 
             /**
@@ -198,11 +452,11 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @description
              *
-             * Queries accessTokens of User.
+             * Queries accessTokens of user.
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `id` – `{*}` - User id
+             *  - `id` – `{*}` - user id
              *
              *  - `options` – `{object=}` -
              *
@@ -227,7 +481,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              */
             "prototype$__get__accessTokens": {
               isArray: true,
-              url: urlBase + "/Users/:id/accessTokens",
+              url: urlBase + "/users/:id/accessTokens",
               method: "GET",
             },
 
@@ -242,7 +496,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `id` – `{*}` - User id
+             *  - `id` – `{*}` - user id
              *
              * @param {Object} postData Request data.
              *
@@ -268,7 +522,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * </em>
              */
             "prototype$__create__accessTokens": {
-              url: urlBase + "/Users/:id/accessTokens",
+              url: urlBase + "/users/:id/accessTokens",
               method: "POST",
             },
 
@@ -283,7 +537,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `id` – `{*}` - User id
+             *  - `id` – `{*}` - user id
              *
              *  - `options` – `{object=}` -
              *
@@ -304,7 +558,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * This method returns no data.
              */
             "prototype$__delete__accessTokens": {
-              url: urlBase + "/Users/:id/accessTokens",
+              url: urlBase + "/users/:id/accessTokens",
               method: "DELETE",
             },
 
@@ -315,11 +569,11 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @description
              *
-             * Counts accessTokens of User.
+             * Counts accessTokens of user.
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `id` – `{*}` - User id
+             *  - `id` – `{*}` - user id
              *
              *  - `options` – `{object=}` -
              *
@@ -342,7 +596,162 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *  - `count` – `{number=}` -
              */
             "prototype$__count__accessTokens": {
-              url: urlBase + "/Users/:id/accessTokens/count",
+              url: urlBase + "/users/:id/accessTokens/count",
+              method: "GET",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.User#prototype$__get__roles
+             * @methodOf lbServices.User
+             *
+             * @description
+             *
+             * Queries roles of user.
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *  - `id` – `{*}` - user id
+             *
+             *  - `options` – `{object=}` -
+             *
+             *  - `filter` – `{object=}` -
+             *
+             *  - `options` – `{object=}` -
+             *
+             * @param {function(Array.<Object>,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Array.<Object>} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * <em>
+             * (The remote method definition does not provide any description.
+             * This usually means the response is a `User` object.)
+             * </em>
+             */
+            "prototype$__get__roles": {
+              isArray: true,
+              url: urlBase + "/users/:id/roles",
+              method: "GET",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.User#prototype$__create__roles
+             * @methodOf lbServices.User
+             *
+             * @description
+             *
+             * Creates a new instance in roles of this model.
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *  - `id` – `{*}` - user id
+             *
+             * @param {Object} postData Request data.
+             *
+             *  - `options` – `{object=}` -
+             *
+             *  - `data` – `{object=}` -
+             *
+             *  - `options` – `{object=}` -
+             *
+             * @param {function(Object,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Object} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * <em>
+             * (The remote method definition does not provide any description.
+             * This usually means the response is a `User` object.)
+             * </em>
+             */
+            "prototype$__create__roles": {
+              url: urlBase + "/users/:id/roles",
+              method: "POST",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.User#prototype$__delete__roles
+             * @methodOf lbServices.User
+             *
+             * @description
+             *
+             * Deletes all roles of this model.
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *  - `id` – `{*}` - user id
+             *
+             *  - `options` – `{object=}` -
+             *
+             *  - `where` – `{object=}` -
+             *
+             *  - `options` – `{object=}` -
+             *
+             * @param {function(Object,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Object} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * This method returns no data.
+             */
+            "prototype$__delete__roles": {
+              url: urlBase + "/users/:id/roles",
+              method: "DELETE",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.User#prototype$__count__roles
+             * @methodOf lbServices.User
+             *
+             * @description
+             *
+             * Counts roles of user.
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *  - `id` – `{*}` - user id
+             *
+             *  - `options` – `{object=}` -
+             *
+             *  - `where` – `{object=}` - Criteria to match model instances
+             *
+             *  - `options` – `{object=}` -
+             *
+             * @param {function(Object,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Object} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * Data properties:
+             *
+             *  - `count` – `{number=}` -
+             */
+            "prototype$__count__roles": {
+              url: urlBase + "/users/:id/roles/count",
               method: "GET",
             },
 
@@ -382,7 +791,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * </em>
              */
             "create": {
-              url: urlBase + "/Users",
+              url: urlBase + "/users",
               method: "POST",
             },
 
@@ -423,7 +832,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              */
             "createMany": {
               isArray: true,
-              url: urlBase + "/Users",
+              url: urlBase + "/users",
               method: "POST",
             },
 
@@ -458,7 +867,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * </em>
              */
             "patchOrCreate": {
-              url: urlBase + "/Users",
+              url: urlBase + "/users",
               method: "PATCH",
             },
 
@@ -498,7 +907,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * </em>
              */
             "replaceOrCreate": {
-              url: urlBase + "/Users/replaceOrCreate",
+              url: urlBase + "/users/replaceOrCreate",
               method: "POST",
             },
 
@@ -537,7 +946,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * </em>
              */
             "upsertWithWhere": {
-              url: urlBase + "/Users/upsertWithWhere",
+              url: urlBase + "/users/upsertWithWhere",
               method: "POST",
             },
 
@@ -571,7 +980,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *  - `exists` – `{boolean=}` -
              */
             "exists": {
-              url: urlBase + "/Users/:id/exists",
+              url: urlBase + "/users/:id/exists",
               method: "GET",
             },
 
@@ -608,7 +1017,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * </em>
              */
             "findById": {
-              url: urlBase + "/Users/:id",
+              url: urlBase + "/users/:id",
               method: "GET",
             },
 
@@ -647,7 +1056,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * </em>
              */
             "replaceById": {
-              url: urlBase + "/Users/:id/replace",
+              url: urlBase + "/users/:id/replace",
               method: "POST",
             },
 
@@ -683,7 +1092,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              */
             "find": {
               isArray: true,
-              url: urlBase + "/Users",
+              url: urlBase + "/users",
               method: "GET",
             },
 
@@ -718,7 +1127,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * </em>
              */
             "findOne": {
-              url: urlBase + "/Users/findOne",
+              url: urlBase + "/users/findOne",
               method: "GET",
             },
 
@@ -754,7 +1163,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * Information related to the outcome of the operation
              */
             "updateAll": {
-              url: urlBase + "/Users/update",
+              url: urlBase + "/users/update",
               method: "POST",
             },
 
@@ -789,7 +1198,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * </em>
              */
             "deleteById": {
-              url: urlBase + "/Users/:id",
+              url: urlBase + "/users/:id",
               method: "DELETE",
             },
 
@@ -823,7 +1232,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *  - `count` – `{number=}` -
              */
             "count": {
-              url: urlBase + "/Users/count",
+              url: urlBase + "/users/count",
               method: "GET",
             },
 
@@ -838,7 +1247,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `id` – `{*}` - User id
+             *  - `id` – `{*}` - user id
              *
              *  - `options` – `{object=}` -
              *
@@ -862,7 +1271,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * </em>
              */
             "prototype$patchAttributes": {
-              url: urlBase + "/Users/:id",
+              url: urlBase + "/users/:id",
               method: "PATCH",
             },
 
@@ -899,7 +1308,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *  - `changes` – `{ReadableStream=}` -
              */
             "createChangeStream": {
-              url: urlBase + "/Users/change-stream",
+              url: urlBase + "/users/change-stream",
               method: "POST",
             },
 
@@ -955,7 +1364,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
                   return response.resource;
                 },
               },
-              url: urlBase + "/Users/login",
+              url: urlBase + "/users/login",
               method: "POST",
             },
 
@@ -1002,7 +1411,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
                   return responseError.resource;
                 },
               },
-              url: urlBase + "/Users/logout",
+              url: urlBase + "/users/logout",
               method: "POST",
             },
 
@@ -1017,7 +1426,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `id` – `{*}` - User id
+             *  - `id` – `{*}` - user id
              *
              * @param {Object} postData Request data.
              *
@@ -1040,7 +1449,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * This method returns no data.
              */
             "prototype$verify": {
-              url: urlBase + "/Users/:id/verify",
+              url: urlBase + "/users/:id/verify",
               method: "POST",
             },
 
@@ -1074,7 +1483,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * This method returns no data.
              */
             "confirm": {
-              url: urlBase + "/Users/confirm",
+              url: urlBase + "/users/confirm",
               method: "GET",
             },
 
@@ -1109,7 +1518,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * This method returns no data.
              */
             "resetPassword": {
-              url: urlBase + "/Users/reset",
+              url: urlBase + "/users/reset",
               method: "POST",
             },
 
@@ -1150,7 +1559,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * This method returns no data.
              */
             "changePassword": {
-              url: urlBase + "/Users/change-password",
+              url: urlBase + "/users/change-password",
               method: "POST",
             },
 
@@ -1189,7 +1598,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              * This method returns no data.
              */
             "setPassword": {
-              url: urlBase + "/Users/reset-password",
+              url: urlBase + "/users/reset-password",
               method: "POST",
             },
 
@@ -1214,7 +1623,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *   from the server.
              */
             'getCurrent': {
-              url: urlBase + "/Users" + '/:id',
+              url: urlBase + "/users" + '/:id',
               method: 'GET',
               params: {
                 id: function() {
@@ -1449,7 +1858,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `id` – `{*}` - User id
+             *  - `id` – `{*}` - user id
              *
              *  - `options` – `{object=}` -
              *
@@ -4163,13 +4572,86 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *   populated with the actual data once the response is returned
              *   from the server.
              *
-             * Data properties:
-             *
-             *  - `log` – `{object=}` -
+             * <em>
+             * (The remote method definition does not provide any description.
+             * This usually means the response is a `Playlist` object.)
+             * </em>
              */
             "clear": {
               url: urlBase + "/playlist/clear",
               method: "POST",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.Playlist#checkIndex
+             * @methodOf lbServices.Playlist
+             *
+             * @description
+             *
+             * <em>
+             * (The remote method definition does not provide any description.)
+             * </em>
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *   This method does not accept any parameters.
+             *   Supply an empty object or omit this argument altogether.
+             *
+             * @param {function(Object,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Object} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * Data properties:
+             *
+             *  - `match` – `{boolean=}` -
+             */
+            "checkIndex": {
+              url: urlBase + "/playlist/checkIndex",
+              method: "GET",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.Playlist#resetPlaylistRemote
+             * @methodOf lbServices.Playlist
+             *
+             * @description
+             *
+             * <em>
+             * (The remote method definition does not provide any description.)
+             * </em>
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *   This method does not accept any parameters.
+             *   Supply an empty object or omit this argument altogether.
+             *
+             * @param {function(Array.<Object>,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Array.<Object>} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * <em>
+             * (The remote method definition does not provide any description.
+             * This usually means the response is a `Playlist` object.)
+             * </em>
+             */
+            "resetPlaylistRemote": {
+              isArray: true,
+              url: urlBase + "/playlist/resetPlaylistRemote",
+              method: "GET",
             },
 
             /**
@@ -4190,7 +4672,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object} postData Request data.
              *
-             * This method does not accept any data. Supply an empty object.
+             *  - `status` – `{object=}` -
              *
              * @param {function(Array.<Object>,Object)=} successCb
              *   Success callback with two arguments: `value`, `responseHeaders`.
@@ -4210,6 +4692,49 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
             "updatePlaylist": {
               isArray: true,
               url: urlBase + "/playlist/updatePlaylist",
+              method: "POST",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.Playlist#moveTrack
+             * @methodOf lbServices.Playlist
+             *
+             * @description
+             *
+             * <em>
+             * (The remote method definition does not provide any description.)
+             * </em>
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *   This method does not accept any parameters.
+             *   Supply an empty object or omit this argument altogether.
+             *
+             * @param {Object} postData Request data.
+             *
+             *  - `fromIndex` – `{number=}` -
+             *
+             *  - `toIndex` – `{number=}` -
+             *
+             * @param {function(Array.<Object>,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Array.<Object>} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * <em>
+             * (The remote method definition does not provide any description.
+             * This usually means the response is a `Playlist` object.)
+             * </em>
+             */
+            "moveTrack": {
+              isArray: true,
+              url: urlBase + "/playlist/moveTrack",
               method: "POST",
             },
 
@@ -4282,9 +4807,10 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *   populated with the actual data once the response is returned
              *   from the server.
              *
-             * Data properties:
-             *
-             *  - `track` – `{object=}` -
+             * <em>
+             * (The remote method definition does not provide any description.
+             * This usually means the response is a `Playlist` object.)
+             * </em>
              */
             "play": {
               url: urlBase + "/playlist/play",

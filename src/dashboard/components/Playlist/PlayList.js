@@ -4,97 +4,20 @@ import {
   FunctionField,
   DateInput,
   TextField,
-  Edit,
-  SimpleForm,
-  TextInput,
   DeleteButton,
   Filter,
   showNotification as showNotificationAction
 } from 'admin-on-rest';
-import Datagrid from '../aor-components/list/Datagrid';
+import Datagrid from '../../aor-components/list/Datagrid';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
-import { CardActions } from 'material-ui/Card';
-import FlatButton from 'material-ui/FlatButton';
-import NavigationRefresh from 'material-ui/svg-icons/navigation/refresh';
-import UpdateIcon from 'material-ui/svg-icons/action/update';
-import ClearIcon from 'material-ui/svg-icons/content/delete-sweep';
+import PlaylistActions from './PlaylistActions';
 import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 
-import ListButton from '../aor-components/buttons/ListButton';
+import ListButton from '../../aor-components/buttons/ListButton';
 
-import { Playlist } from '../api';
-
-const cardActionStyle = {
-  zIndex: 2,
-  display: 'inline-block',
-  float: 'right'
-};
-
-let PlaylistActions = ({
-  resource,
-  filters,
-  displayedFilters,
-  filterValues,
-  basePath,
-  showFilter,
-  refresh,
-  showNotification
-}) =>
-  <CardActions style={cardActionStyle}>
-    {filters &&
-      React.cloneElement(filters, {
-        resource,
-        showFilter,
-        displayedFilters,
-        filterValues,
-        context: 'button'
-      })}
-    <FlatButton
-      primary
-      label="refresh"
-      onClick={refresh}
-      icon={<NavigationRefresh />}
-    />
-    <FlatButton
-      secondary
-      label="Update Playlist"
-      icon={<UpdateIcon />}
-      onClick={e => {
-        e.persist();
-        Playlist.updatePlaylist()
-          .then(res => {
-            showNotification('Playlist updated');
-            refresh(e);
-          })
-          .catch(err => {
-            showNotification(`${err.message}`, 'warning');
-          });
-      }}
-    />
-    <FlatButton
-      secondary
-      label="Clear Playlist"
-      icon={<ClearIcon />}
-      onClick={e => {
-        e.persist();
-        Playlist.clear()
-          .then(info => {
-            console.log(info);
-            showNotification(`Deleted ${info.count} tracks from playlist`);
-            refresh(e);
-          })
-          .catch(err => {
-            showNotification(`${err.message}`, 'warning');
-          });
-      }}
-    />
-  </CardActions>;
-
-PlaylistActions = connect(null, {
-  showNotification: showNotificationAction
-})(PlaylistActions);
+import { Playlist } from '../../api';
 
 const PlaylistFilter = props =>
   <Filter {...props}>
@@ -111,10 +34,6 @@ const PlaylistFilter = props =>
   </Filter>;
 
 class PlayListContainer extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   handlePositionChange = ({ oldIndex, newIndex, item, replacedItem }) => {
     let { showNotification } = this.props;
 
@@ -185,15 +104,3 @@ class PlayListContainer extends Component {
 export let PlayList = connect(null, {
   showNotification: showNotificationAction
 })(PlayListContainer);
-
-export const PlayEdit = props =>
-  <Edit {...props}>
-    <SimpleForm {...props}>
-      <TextInput
-        options={{
-          fullWidth: true
-        }}
-        source="name"
-      />
-    </SimpleForm>
-  </Edit>;

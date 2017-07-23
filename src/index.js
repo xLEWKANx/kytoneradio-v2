@@ -4,7 +4,7 @@ import App from './dashboard/components/App';
 import './dashboard/index.css';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
-injectTapEventPlugin();
+// injectTapEventPlugin();
 
 ReactDOM.render(
   <App />,

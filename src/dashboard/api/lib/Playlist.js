@@ -205,8 +205,36 @@ class Playlist {
     }).catch(err => Promise.reject(err));
   }
 
+  static checkIndex() {
+    let url = `${this.baseUrl()}/checkIndex`;
+    return this.fetch(url, {
+      method: 'GET',
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
+  static resetPlaylistRemote() {
+    let url = `${this.baseUrl()}/resetPlaylistRemote`;
+    return this.fetch(url, {
+      method: 'GET',
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
   static updatePlaylist(status) {
     let url = `${this.baseUrl()}/updatePlaylist`;    let body = { status };
+    return this.fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(body)
+    }).then(res => {
+      return res;
+    }).catch(err => Promise.reject(err));
+  }
+
+  static moveTrack(fromIndex, toIndex) {
+    let url = `${this.baseUrl()}/moveTrack`;    let body = { fromIndex, toIndex };
     return this.fetch(url, {
       method: 'POST',
       body: JSON.stringify(body)

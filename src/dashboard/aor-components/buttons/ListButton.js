@@ -8,15 +8,19 @@ const ListButton = ({
   buttonLabel,
   onClick,
   icon,
-  disabledField
+  basePath,
+  disabledField,
+  ...rest
 }) =>
   <FlatButton
-    primary
+
     label={buttonLabel}
-    onClick={() => onClick(record)}
+    onClick={(e) => onClick(e, record)}
     icon={icon}
-    disabled={!record.processed}
+    disabled={disabledField && !record[disabledField]}
+    {...rest}
   />;
+;
 
 ListButton.propTypes = {
   buttonLabel: PropTypes.string,

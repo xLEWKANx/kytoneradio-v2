@@ -34,7 +34,12 @@ export const fetchJson = (url, options = {}) => {
       }
       if (status < 200 || status >= 300) {
         return Promise.reject(
-          new HttpError((json && json.message) || statusText, status)
+          new HttpError(
+            (json && json.message) ||
+              (json.error && json.error.message) ||
+              statusText,
+            status
+          )
         );
       }
       return { status, headers, body, json };
@@ -48,11 +53,11 @@ export const queryParams = data => {
     }
   }
   return (
-    '?' + Object.keys(data)
+    '?' +
+    Object.keys(data)
       .map(key =>
         [key, JSON.stringify(data[key])].map(encodeURIComponent).join('=')
       )
       .join('&')
   );
 };
-

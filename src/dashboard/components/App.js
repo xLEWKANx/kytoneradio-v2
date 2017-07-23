@@ -1,6 +1,6 @@
 import React from 'react';
 import { Admin, Resource, Delete } from 'admin-on-rest';
-import loopbackRestClient, { authClient } from 'aor-loopback';
+import loopbackRestClient, { authClient } from '../lib/aor-loopback';
 import { SlideList, SlideEdit, SlideCreate } from './Slides';
 import { TrackList, TrackEdit } from './Tracks';
 import { PlayList, PlayEdit } from './Playlist';

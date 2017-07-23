@@ -96,6 +96,7 @@ class DatagridBody extends Component {
         lockAxis="true"
         onSortStart={({ node, index }) => {}}
         onSortEnd={this.handleMove}
+        distance={25}
         {...rest}
         {...options}
       >

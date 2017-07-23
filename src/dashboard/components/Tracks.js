@@ -34,7 +34,7 @@ const cardActionStyle = {
   float: 'right'
 };
 
-let PostActions = ({
+let TrackActions = ({
   resource,
   filters,
   displayedFilters,
@@ -75,9 +75,9 @@ let PostActions = ({
     />
   </CardActions>;
 
-PostActions = connect(null, {
+TrackActions = connect(null, {
   showNotification: showNotificationAction
-})(PostActions);
+})(TrackActions);
 
 const TrackFilter = props =>
   <Filter {...props}>
@@ -87,7 +87,7 @@ const TrackFilter = props =>
 export let TrackList = ({ showNotification, ...props }) =>
   <div>
     <Uploader />
-    <List {...props} filters={<TrackFilter />} actions={<PostActions />}>
+    <List {...props} filters={<TrackFilter />} actions={<TrackActions />}>
       <Datagrid>
         <FunctionField
           label="Time"
@@ -100,9 +100,9 @@ export let TrackList = ({ showNotification, ...props }) =>
         <TextField source="title" label="Track" />
         <ListButton
           buttonLabel="Add To Playlist"
-          disabledField="isProccesed"
+          disabledField="processed"
           icon={<PlaylistAddIcon />}
-          onClick={record => {
+          onClick={(e, record) => {
             new Track(record).addToPlaylist().then(res => {
               let startTime = moment(res.startTime).format('HH:mm:ss');
               showNotification(`Track will be played at ${startTime}`);

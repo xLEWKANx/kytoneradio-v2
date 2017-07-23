@@ -215,8 +215,9 @@ module.exports = function(Playlist) {
 
   Playlist.remoteMethod('clear', {
     returns: {
-      arg: 'log',
-      type: 'object'
+      arg: 'info',
+      type: 'object',
+      root: true
     }
   });
 

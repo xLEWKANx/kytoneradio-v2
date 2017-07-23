@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import {
   List,
   FunctionField,
@@ -110,69 +110,81 @@ const PlaylistFilter = props =>
     />
   </Filter>;
 
-export let PlayList = ({ showNotification, ...props }) =>
-  <div>
-    <List
-      {...props}
-      sort={{ field: 'startTime', order: 'ASC' }}
-      list={{}}
-      filters={<PlaylistFilter />}
-      actions={<PlaylistActions />}
-    >
-      <Datagrid
-        onPositionChange={({ oldIndex, newIndex, item, replacedItem }) => {
-          Playlist.moveTrack(item.index, replacedItem.index)
-            .then(newPlaylist => {
-              // return refresh();
-            })
-            .catch(err => {
-              showNotification(`Error: ${err}`, 'warning');
-            });
-        }}
-      >
-        <TextField
-          source="index"
-          label="index"
-          style={{
-            maxWidth: 25
-          }}
-        />
-        <TextField
-          source="order"
-          label="order"
-          style={{
-            maxWidth: 25
-          }}
-        />
+class PlayListContainer extends Component {
+  constructor(props) {
+    super(props);
+  }
 
-        <FunctionField
-          label="Start Time"
-          render={record => moment(record.startTime).format('HH:mm:ss')}
-        />
-        <FunctionField
-          label="End Time"
-          render={record => moment(record.endTime).format('HH:mm:ss')}
-        />
-        <TextField source="name" label="Track" />
-        <ListButton
-          default
-          icon={<PlayIcon />}
-          onClick={(e, record) => {
-            Playlist.play(record.index).then(track => {
-              showNotification(`Playing track ${track.name}`);
-            }).catch((err) =>
-              showNotification(`Error: ${err.message}`, 'warning')
-            );
-          }}
-        />
-        <DeleteButton />
-      </Datagrid>
-    </List>
-  </div>;
+  handlePositionChange = ({ oldIndex, newIndex, item, replacedItem }) => {
+    let { showNotification } = this.props;
 
-PlayList = connect(null, {
+    Playlist.moveTrack(item.index, replacedItem.index)
+      .then(newPlaylist => {
+        // return refresh();
+      })
+      .catch(err => {
+        showNotification(`Error: ${err}`, 'warning');
+      });
+  };
+
+  playTrack = (e, record) => {
+    let { showNotification } = this.props;
+
+    Playlist.play(record.index)
+      .then(track => {
+        showNotification(`Playing track ${track.name}`);
+      })
+      .catch(err => showNotification(`Error: ${err.message}`, 'warning'));
+  };
+
+  render() {
+    let { showNotification, ...props } = this.props;
+    return (
+      <div>
+        <List
+          {...props}
+          sort={{ field: 'startTime', order: 'ASC' }}
+          list={{}}
+          filters={<PlaylistFilter />}
+          actions={<PlaylistActions />}
+        >
+          <Datagrid onPositionChange={this.handlePositionChange}>
+            <TextField
+              source="index"
+              label="index"
+              style={{
+                maxWidth: 25
+              }}
+            />
+            <TextField
+              source="order"
+              label="order"
+              style={{
+                maxWidth: 25
+              }}
+            />
+
+            <FunctionField
+              label="Start Time"
+              render={record => moment(record.startTime).format('HH:mm:ss')}
+            />
+            <FunctionField
+              label="End Time"
+              render={record => moment(record.endTime).format('HH:mm:ss')}
+            />
+            <TextField source="name" label="Track" />
+            <ListButton default icon={<PlayIcon />} onClick={this.playTrack} />
+            <DeleteButton />
+          </Datagrid>
+        </List>
+      </div>
+    );
+  }
+}
+
+export let PlayList = connect(null, {
   showNotification: showNotificationAction
-})(PlayList);
+})(PlayListContainer);
 
 export const PlayEdit = props =>
   <Edit {...props}>

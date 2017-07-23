@@ -33,6 +33,12 @@ export default (apiUrl, httpClient = fetchJson, transformFilters) => {
     resource = resource.toLowerCase();
     let url = '';
     const options = {};
+
+    let transformFn =
+      transformFilters[type] &&
+      typeof transformFilters[type][resource] === 'function' &&
+      transformFilters[type][resource];
+
     switch (type) {
       case GET_LIST: {
         const { page, perPage } = params.pagination;
@@ -46,9 +52,11 @@ export default (apiUrl, httpClient = fetchJson, transformFilters) => {
             query['skip'] = (page - 1) * perPage;
           }
         }
-        if (transformFilters && typeof transformFilters === 'function') {
-          query = transformFilters(type, resource, params, query);
-        }
+
+        if (transformFn) {
+          query = transformFn(params, query);
+        };
+
         url = `${apiUrl}/${resource}?${queryParameters({
           filter: JSON.stringify(query)
         })}`;

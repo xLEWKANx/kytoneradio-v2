@@ -258,7 +258,13 @@ module.exports = function(Player) {
   };
 
   Player.stream = function(req, res, cb) {
-    let stream = request('http://localhost:15001/stream')
+    const options = {
+      url: 'http://localhost:15001/stream',
+      headers: {
+        'User-Agent': 'request'
+      }
+    };
+    let stream = request.get(options)
       .on('error', err => {
         return cb('Stream is no avalible');
       })

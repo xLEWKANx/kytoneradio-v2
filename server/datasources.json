@@ -1,14 +1,14 @@
 {
   "db": {
+    "url": "mongodb://localhost:27017/kytone",
     "name": "db",
-    "connector": "memory"
+    "connector": "mongodb"
   },
-  "memory": {
-    "name": "memory",
-    "connector": "memory"
-  },
-  "transient": {
-    "name": "transient",
-    "connector": "transient"
+  "storage": {
+    "name": "trackStorage",
+    "provider": "filesystem",
+    "connector": "loopback-component-storage",
+    "root": "./storage",
+    "maxFileSize": "524288000"
   }
 }

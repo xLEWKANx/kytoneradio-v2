@@ -1,12 +1,12 @@
-"use strict";
-const debug = require("debug");
-const Promise = require("bluebird");
-const moment = require("moment");
-const _ = require("lodash");
-const schedule = require("node-schedule");
-const colors = require("colors")
+const debug = require('debug');
+const Promise = require('bluebird');
+const moment = require('moment');
+const _ = require('lodash');
+const schedule = require('node-schedule');
+const colors = require('colors');
+const createPromiseCallback = require('../../lib/utils').createPromiseCallback;
 
-const log = debug("player:playlist");
+const log = debug('player:playlist');
 global.Promise = Promise;
 
 module.exports = function(Playlist) {
@@ -16,124 +16,183 @@ module.exports = function(Playlist) {
     current: null
   };
 
-  Playlist.getCurrentTrack = function(cb) {
-    let Player = Playlist.app.models.Player;
+  Playlist.addSecond = (date, duration) => {
+    if (!date) throw new Error(`date is ${date}`);
+    return moment(date).add(duration, 'seconds').toDate();
+  };
 
-    Player.currentTrackIndexPromised()
+  Playlist.prototype.simplifyTime = function() {
+    let inst = Object.assign({}, this.toJSON(), {
+      startTime: moment.utc(this.startTime).format('HH:mm:ss'),
+      endTime: moment.utc(this.endTime).format('HH:mm:ss')
+    });
+
+    return inst;
+  };
+
+  Playlist.prototype.setIndex = function(prev) {
+    this.index = prev ? prev.index + 1 : 0;
+    return this;
+  };
+
+  Playlist.prototype.setTime = function(prev) {
+    this.startTime = prev ? prev.endTime : new Date();
+    this.endTime = Playlist.addSecond(this.startTime, this.duration);
+    return this;
+  };
+
+  Playlist.prototype.setOrder = function(prev) {
+    this.order = prev ? prev.order + 1 : 0;
+    return this;
+  };
+
+  Playlist.prototype.setPlayCount = function() {
+    this.playedTimes += 1;
+    return this;
+  };
+
+  Playlist.prototype.updateInfoFromPrev = function(prev) {
+    return this.setTime(prev).setOrder(prev);
+  };
+
+  Playlist.createFakeTracks = function(count, tracks = [], cb) {
+    cb = cb || createPromiseCallback();
+
+    let Track = Playlist.app.models.Track;
+    const TRACK_DURATION = 30 * 60;
+
+    const MOCK_TRACK = new Track({
+      name: 'test track ' + tracks.length,
+      processed: true,
+      duration: TRACK_DURATION,
+      path: 'e:/music'
+    });
+
+    MOCK_TRACK.save()
+      .then(track => {
+        return Playlist.add(MOCK_TRACK).then(ptrack => {
+          tracks = tracks.concat(ptrack);
+          if (count === 0) return cb(null, tracks);
+
+          return Playlist.createFakeTracks(count - 1, tracks, cb);
+        });
+      })
+      .catch(cb);
+
+    return cb.promise;
+  };
+
+  Playlist.add = function(track, cb) {
+    cb = cb || createPromiseCallback();
+
+    let playlistTrack = new Playlist({
+      name: track.name,
+      duration: track.duration,
+      trackId: track.id
+    });
+
+    Playlist.findOne({
+      order: 'index DESC'
+    })
+      .then(prev =>
+        playlistTrack.setIndex(prev).updateInfoFromPrev(prev).save()
+      )
+      .then(track => cb(null, track))
+      .catch(cb);
+
+    return cb.promise;
+  };
+
+  Playlist.prototype.moveToEnd = function(cb) {
+    cb = cb || createPromiseCallback();
+
+    Playlist.findOne({
+      order: ['order DESC', 'index DESC']
+    })
+      .then(last => this.updateInfoFromPrev(last).setPlayCount().save())
+      .then(track => cb(null, track))
+      .catch(cb);
+
+    return cb.promise;
+  };
+
+  Playlist.getCurrentTrack = function(cb) {
+    cb = cb || createPromiseCallback();
+
+    let Player = Playlist.app.models.Player;
+    Player.currentTrackIndex()
       .then(index => {
         return Playlist.findOne({
           where: {
             index: index
           },
-          include: ["track"]
+          include: ['track']
         });
       })
       .then(track => cb(null, track))
       .catch(cb);
+
+    return cb.promise;
   };
 
-  Playlist.remoteMethod("now", {
+  Playlist.remoteMethod('getCurrentTrack', {
     http: {
-      verb: "get"
+      verb: 'get'
     },
     returns: {
-      arg: "track",
+      arg: 'track',
       root: true,
-      type: "obj"
+      type: 'object'
     }
   });
 
-  Playlist.nextTrack = function(cb) {
-    let Player = Playlist.app.models.Player;
+  Playlist.tracksByOrder = function(cb) {
+    cb = cb || createPromiseCallback();
 
-    Player.nextTrackIndexPromised()
-      .then(index => {
-        return Playlist.findOnePromised({ where: { index: index } });
-      })
-      .then(track => cb(null, track))
-      .catch(cb);
+    Playlist.find(
+      {
+        order: ['order ASC', 'index ASC']
+      },
+      cb
+    );
+
+    return cb.promise;
   };
 
-  Playlist.remoteMethod("nextTrack", {
+  Playlist.remoteMethod('tracksByOrder', {
     http: {
-      verb: "get"
+      verb: 'get'
     },
     returns: {
-      arg: "track",
-      type: "object"
+      arg: 'tracks',
+      root: true,
+      type: 'array'
     }
   });
 
   Playlist.getSchedule = function(cb) {
-    let Player = Playlist.app.models.Player;
+    cb = cb || createPromiseCallback();
 
-    Player.currentTrackIndexPromised()
-      .then(index =>
-        Playlist.findPromised({
-          where: {
-            index: {
-              gt: index
-            }
-          },
-          include: ["track"],
-          limit: 5
-        }))
-      .then(tracks => cb(null, tracks))
-      .catch(cb);
+    Playlist.find(
+      {
+        include: ['track'],
+        order: ['order ASC', 'index ASC'],
+        limit: 5
+      },
+      cb
+    );
+
+    return cb.promise;
   };
 
-  Playlist.remoteMethod("getSchedule", {
+  Playlist.remoteMethod('getSchedule', {
     http: {
-      verb: "get"
+      verb: 'get'
     },
     returns: {
-      arg: "tracks",
+      arg: 'tracks',
       root: true,
-      type: "array"
-    }
-  });
-
-  Playlist.createFakeTracks = function (count, tracks = [], cb) {
-    let Track = Playlist.app.models.Track;
-    const TRACK_DURATION = 10;
-
-    let playlist = [];
-    let startTime = new Date();
-
-    const MOCK_TRACK = new Track({
-      name: 'test track',
-      processed: true,
-      duration: TRACK_DURATION
-    })
-
-    let MOCK_PLAYLIST_TRACK = new Playlist({
-      name: 'test playlist track',
-      duration: TRACK_DURATION,
-      index: 0
-    })
-
-    MOCK_TRACK.playlist.create(MOCK_PLAYLIST_TRACK, (err, track) => {
-      if (err) return cb(err);
-      tracks = tracks.concat(track)
-      if (count === 0) return cb(null, tracks);
-
-      return Playlist.createFakeTracks(count - 1, tracks, cb);
-    })
-  };
-
-  Playlist.addSecond = (date, duration) => {
-    if (!date) throw new Error(`date is ${date}`);
-    return moment(date).add(duration, "seconds").toDate();
-  };
-
-  Playlist.remoteMethod("decIndexFrom", {
-    accepts: {
-      arg: "index",
-      type: "number"
-    },
-    returns: {
-      arg: "tracks",
-      type: "array"
+      type: 'array'
     }
   });
 
@@ -142,11 +201,11 @@ module.exports = function(Playlist) {
 
     Player.clearPromised()
       .then(() => {
-        log("before destroy");
+        log('before destroy');
         return Playlist.destroyAllPromised({}, { skip: true });
       })
       .then(result => {
-        log("Playlist clear", result);
+        log('Playlist clear', result);
         cb(null, result);
       })
       .catch(err => {
@@ -154,73 +213,263 @@ module.exports = function(Playlist) {
       });
   };
 
-  Playlist.remoteMethod("clear", {
+  Playlist.remoteMethod('clear', {
     returns: {
-      arg: "log",
-      type: "object"
+      arg: 'info',
+      type: 'object',
+      root: true
     }
   });
 
-  Playlist.play = function(cb) {
-    if (!cb) cb = function() {};
+  Playlist.checkIndex = function(cb) {
+    cb = cb || createPromiseCallback();
+
     let Player = Playlist.app.models.Player;
-    Player.currentTrackIndexPromised()
-      .then(index => {
-        log("static play | index:", index);
-        return Playlist.findPromised({
+
+    let promises = [Playlist.find({}), Player.playlist()];
+
+    Promise.all(promises)
+      .then(res => {
+        let [playlist, mpdPlaylist] = res;
+        // log('check index', mpdPlaylist, playlist);
+        log('check index', playlist.length, Object.keys(mpdPlaylist).length);
+
+        if (playlist.length !== Object.keys(mpdPlaylist).length) {
+          return Promise.reject(new Error("playlist don't match"));
+        }
+
+        let allMatch = playlist.every(
+          (track, i) => {
+            return mpdPlaylist[track.index] === track.name;
+          }
+        );
+
+        if (!allMatch) {
+          return Promise.reject(new Error('playlist have wrong index'));
+        }
+
+        return cb(null, true);
+      })
+      .catch(cb);
+
+    return cb.promise;
+  };
+
+  Playlist.remoteMethod('checkIndex', {
+    http: {
+      verb: 'get'
+    },
+    returns: {
+      arg: 'match',
+      type: 'boolean'
+    }
+  });
+
+  Playlist.resetPlaylist = function(mpdPlaylist, cb) {
+    cb = cb || createPromiseCallback();
+
+    const Track = Playlist.app.models.Track;
+    const trackNames = [];
+
+    for (let key in mpdPlaylist) {
+      trackNames.push(mpdPlaylist[key]);
+    }
+    Playlist.destroyAll({}, { skip: true })
+      .then(() => {
+        return Track.find({
           where: {
-            index: {
-              gte: index
+            name: {
+              inq: trackNames
             }
           }
         });
       })
       .then(tracks => {
-        log("static play | tracks", tracks);
-        return Playlist.updateTimeAndIndexPromised(tracks, {
-          startTime: new Date()
+        let mpdTracks = _.values(mpdPlaylist);
+
+        let sorted = mpdTracks.map((name, i) => {
+          let track = _.find(tracks, { name: name });
+          if (!track) Promise.reject('Track in mpd but not in Track collection');
+          return track;
         });
+
+        return sorted;
       })
-      .then(tracks => {
-        if (tracks.length) {
-          return tracks[0].playPromised().then(track => cb(null, track));
-        } else {
-          cb("static play | No tracks to play");
-        }
-      })
-      .catch(cb);
-  };
-
-
-  Playlist.remoteMethod("play", {
-    returns: {
-      arg: "track",
-      type: "object"
-    }
-  });
-
-  Playlist.updateTime = function (cb) {
-
-    Playlist.find({
-        order: "index ASC"
-      })
-      .then(tracks => {
-        log("update time | tracks", tracks);
-        let playing = tracks[0];
-        return Playlist.updateTimeAndIndexPromised(tracks.slice(1), {
-          startTime: playing.endTime,
-          index: playing.index + 1
-        });
+      .mapSeries(track => {
+        return Playlist.add(track);
       })
       .then(tracks => cb(null, tracks))
       .catch(cb);
-  }
 
-  Playlist.remoteMethod("updateTime", {
+    return cb.promise;
+  };
+
+  Playlist.resetPlaylistRemote = function(cb) {
+    cb = cb || createPromiseCallback();
+
+    const Player = Playlist.app.models.Player;
+
+    Player.playlist()
+      .then(mpdPlaylist => {
+        return Playlist.resetPlaylist(mpdPlaylist);
+      })
+      .then(ptracks => cb(null, ptracks))
+      .catch(cb);
+
+    return cb.promise;
+  };
+
+  Playlist.remoteMethod('resetPlaylistRemote', {
+    http: {
+      verb: 'get'
+    },
     returns: {
-      arg: "tracks",
-      type: "array"
+      arg: 'tracks',
+      type: 'array',
+      root: true
     }
+  });
+
+  const setOrder = (ptracks, status) => {
+    let startTime;
+
+    switch (status.state) {
+      case 'play':
+        startTime = Playlist.addSecond(new Date(), -status.elapsed);
+        break;
+      default:
+        startTime = new Date();
+    }
+    console.log('status', status.song);
+    let orderedPlaylsit = [
+      ...ptracks.slice(status.song || 0),
+      ...ptracks.slice(0, status.song || 0)
+    ];
+
+    orderedPlaylsit.reduce(
+      (prev, track) => {
+        if (prev.endTime !== track.startTime) track.setTime(prev);
+        if (prev.order !== track.order - 1) track.setOrder(prev);
+        return track;
+      },
+      {
+        endTime: startTime,
+        order: -1
+      }
+    );
+
+    return ptracks;
+  };
+
+  Playlist.updatePlaylist = function(inputStatus, cb) {
+    // TODO check before update
+    console.log('Updating time!'.green, inputStatus);
+
+    cb = cb || createPromiseCallback();
+    let Player = Playlist.app.models.Player;
+
+    let getStatus = inputStatus ?
+      Promise.resolve(inputStatus) :
+      Player.getStatus();
+
+    Player.playlist()
+      .then(mpdPlaylist => {
+        return Promise.all([Playlist.resetPlaylist(mpdPlaylist), getStatus]);
+      })
+      .then(res => {
+        let [tracks, status = inputStatus] = res;
+        if (!tracks.length) return Promise.reject('Playlist empty!');
+        let ordered = setOrder(tracks, status);
+        return ordered;
+      })
+      .map(track => track.save())
+      .then(tracks => cb(null, _.sortBy(tracks, 'order')))
+      .catch(cb);
+
+    return cb.promise;
+  };
+
+  Playlist.remoteMethod('updatePlaylist', {
+    accepts: {
+      arg: 'status',
+      type: 'object'
+    },
+    returns: {
+      arg: 'tracks',
+      type: 'array',
+      root: true
+    }
+  });
+
+  Playlist.moveTrack = function(fromIndex, toIndex, cb) {
+    cb = cb || createPromiseCallback();
+    const Player = Playlist.app.models.Player;
+    Player.moveTrack(fromIndex, toIndex).then(() => {
+      return Playlist.updatePlaylist();
+    }).then(tracks => cb(null, tracks))
+    .catch(cb);
+
+    return cb.promise;
+  };
+
+  Playlist.remoteMethod('moveTrack', {
+    accepts: [{
+      arg: 'fromIndex',
+      type: 'number'
+    }, {
+      arg: 'toIndex',
+      type: 'number'
+    }],
+    returns: {
+      arg: 'tracks',
+      type: 'array',
+      root: true
+    }
+  });
+
+  Playlist.deleteTracks = function(indexes, cb) {
+    cb = cb || createPromiseCallback();
+
+    let Player = Playlist.app.models.Player;
+    if (!Array.isArray(indexes)) {
+      indexes = [indexes];
+    }
+
+    Playlist.destroyAll({
+      index: {
+        inq: indexes
+      }
+    })
+      .then(() => Player.getStatus())
+      .then(status => Playlist.updatePlaylist(status, cb))
+      .catch(cb);
+
+    return cb.promise;
+  };
+
+  Playlist.observe('before delete', (ctx, next) => {
+    if (ctx.options.skip) return next();
+    console.log('before delete', ctx.where);
+    let Player = ctx.Model.app.models.Player;
+    Playlist.find({
+      where: ctx.where
+    })
+      .then(ptracks => {
+        if (!ptracks.length) return next('Track not in playlist');
+        return Promise.all(
+          ptracks.map(ptrack => Player.deleteTrack(ptrack.index))
+        );
+      })
+      .then(res => {
+        next();
+      })
+      .catch(next);
+  });
+
+  Playlist.observe('after delete', (ctx, next) => {
+    if (ctx.options.skip) return next();
+    console.log('after delete');
+    Playlist.updatePlaylist(null, next);
   });
 
   Playlist.stop = function(cb) {
@@ -233,204 +482,102 @@ module.exports = function(Playlist) {
       .catch(cb);
   };
 
-  Playlist.remoteMethod("stop", {
+  Playlist.remoteMethod('stop', {
     returns: {
-      arg: "track",
-      type: "obj"
+      arg: 'track',
+      type: 'obj'
     }
   });
 
-  Playlist.getIndex = function(cb) {
-    Playlist.count(
-      {
-        index: {
-          gte: 0
-        }
-      },
-      cb
-    );
-  };
+  Playlist.play = function(index, cb) {
+    if (typeof index === 'function') {
+      cb = index;
+      index = null;
+    }
 
-  Playlist.prototype.setIndex = function(cb) {
-    Playlist.findOne(
-      {
-        order: 'index DESC'
-      },
-      (err, track) => {
-        if (err) return cb(err);
-        this.index = track ? track.index + 1 : 0;
-        log("set index", this.index, "for", this.name);
-        return cb(null, this);
-      }
-    );
-  };
+    const Player = Playlist.app.models.Player;
 
-  Playlist.setTimeForTracks = function(tracks, startTime) {
-    let beginingTrack = {
-      endTime: startTime
-    };
-    tracks.reduce((prev, track) => track.setTime(prev), beginingTrack);
-    return tracks;
-  };
-
-  Playlist.setIndexesForTracks = function(tracks, startIndex) {
-    tracks.reduce(
-      (prev, track) => Object.assign(track, { index: prev.index + 1 }),
-      { index: startIndex - 1 }
-    );
-    return tracks;
-  };
-
-  Playlist.saveTracks = function(tracks, cb) {
-    return Promise.all(tracks)
-      .mapSeries(track => track.savePromised())
-      .then(tracks => cb(null, tracks))
-      .catch(cb);
-  };
-
-  Playlist.updateTimeAndIndex = function(tracks, options, cb) {
-    let index = options.index;
-    let startTime = options.startTime;
-    if (isFinite(index)) tracks = Playlist.setIndexesForTracks(tracks, index);
-    if (startTime) tracks = Playlist.setTimeForTracks(tracks, startTime);
-    log("updateTimeAndIndex | track updated", tracks);
-    return Playlist.saveTracks(tracks, cb);
-  };
-
-  Playlist.prototype.setTime = function(prev) {
-    return Object.assign(this, {
-      startTime: prev.endTime,
-      endTime: Playlist.addSecond(prev.endTime, this.duration)
-    });
-  };
-
-  Playlist.prototype.setTimeFromPrev = function(cb) {
-    log("set time for", this);
-    Playlist.findOnePromised({
-      where: {
-        and: [
-          {
-            index: {
-              gte: 0
-            }
-          },
-          {
-            index: {
-              lt: this.index
-            }
-          }
-        ]
-      },
-      order: "index DESC",
-      include: "track"
-    })
-      .then(lastPlaylistTrack => {
-        log("lastPlaylistTrack", lastPlaylistTrack);
-        if (!lastPlaylistTrack || lastPlaylistTrack.endTime < Date.now()) {
-          lastPlaylistTrack = {
-            endTime: new Date()
-          };
-        }
-        this.setTime(lastPlaylistTrack);
-        log("setTime track:", this);
-        cb(null, this);
-      })
-      .catch(err => {
-        cb(err);
+    const plaingTrack = index ?
+      Playlist.findOne({
+        where: { index }
+      }) :
+      Player.getStatus().then(status => {
+        index = status.song;
+        return Playlist.findOne({
+          where: { index: status.song }
+        });
       });
+
+    cb = cb || createPromiseCallback();
+
+    plaingTrack
+      .then(track => {
+        if (!track) {
+          return Promise.reject(new Error('No track with index ' + index));
+        }
+        return track.play();
+      })
+      .then(() => {
+        return Playlist.updatePlaylist();
+      })
+      .then(tracks => {
+        log('Playlist.play | playing', tracks[0]);
+        return cb(null, tracks[0]);
+      })
+      .catch(cb);
+
+    return cb.promise;
   };
+
+  Playlist.remoteMethod('play', {
+    accepts: [
+      {
+        arg: 'index',
+        type: 'number'
+      }
+    ],
+    returns: {
+      arg: 'track',
+      type: 'object',
+      root: true
+    }
+  });
 
   Playlist.prototype.play = function(cb) {
+    cb = cb || createPromiseCallback();
     let Player = Playlist.app.models.Player;
-    let index = this.index;
- 
-    Player.playPromised(index)
-      .then(() => {
-        Playlist.emit("playing", this);
-        return cb(null, this);
+
+    this.scheduleNext();
+    Player.play(this.index)
+      .then(() => Playlist.getSchedule())
+      .then(tracks => {
+        Playlist.app.io.emit('track', tracks[0]);
+        Playlist.app.io.emit('playlist', tracks);
+        return cb(null, { nextTrack: this.endTime });
       })
       .catch(cb);
+
+    return cb.promise;
   };
 
-  Playlist.prototype.playNext = function(cb) {
+  Playlist.prototype.scheduleNext = function(cb) {
+    cb = cb || createPromiseCallback();
+
     let Player = Playlist.app.models.Player;
     let { endTime, index } = this;
-    console.log(">>> Next track in: ".cyan, endTime, this);
+    console.log('>>> Next track in: '.cyan, endTime);
     if (scheduleNext) scheduleNext.cancel();
 
     scheduleNext = schedule.scheduleJob(endTime, () => {
-
-      this.moveToEndPromised()
-        .then(() => Playlist.findOne({
-          where: { index: index + 1 }
-        }))
-        .then(track => {
-          log("play next track", track);
-          if (!track) {
-            console.log(">>> !! QUEUE END");
-            return Player.stopPromised();
-          } else {
-            Playlist.emit("playing", track);
-          }
-        })
-        .catch(err => Playlist.emit("error", err));
+      console.log('Scheduler starts');
+      process.nextTick(() => {
+        Playlist.play(cb);
+      });
     });
 
-    if (cb) return cb(null, "success");
+    return cb.promise;
   };
 
-  Playlist.prototype.moveToEnd = function (cb) {
-    return this
-      .setIndexPromised()
-      .then(track => {
-        return track.setTimeFromPrevPromised();
-      })
-      .then((track) => track.save())
-      .then((track) => cb(null, track))
-      .catch((err) => { console.log('error', err); cb(err) });
-  };
-
-  Playlist.observe("before save", (ctx, next) => {
-    if (ctx.options.skip) return next();
-    log("before save | ctx", _.keys(ctx));
-    if (ctx.instance && ctx.isNewInstance) {
-      log("instance", ctx.instance);
-      return updateTrackInfo(ctx.instance, next);
-    } else if (ctx.where && ctx.where.index) {
-      next();
-    } else {
-      return next();
-    }
-  });
-
-  function updateTrackInfo(track, next) {
-    return track
-      .setIndexPromised()
-      .then(track => {
-        return track.setTimeFromPrevPromised();
-      })
-      .catch(next);
-  }
-
-  Playlist.on("playing", playlistTrack => {
-
-    Playlist.info.current = playlistTrack;
-    Playlist.info.status = 'Playing';
-
-    console.log('>>> Player info:\n'.magenta, JSON.stringify(Playlist.info, null, 2));
-    playlistTrack.playNext();
-
-    playlistTrack.track((err, track) => {
-      if (err) return console.error(err);
-      Playlist.app.io.emit("track", track);
-    });
-
-    Playlist.getSchedulePromised().then(tracks => {
-      Playlist.app.io.emit("playlist", tracks);
-    });
-
-  });
-
-  Promise.promisifyAll(Playlist, { suffix: "Promised" });
-  Promise.promisifyAll(Playlist.prototype, { suffix: "Promised" });
+  Promise.promisifyAll(Playlist, { suffix: 'Promised' });
+  Promise.promisifyAll(Playlist.prototype, { suffix: 'Promised' });
 };

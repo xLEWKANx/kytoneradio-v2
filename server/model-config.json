@@ -4,8 +4,7 @@
       "loopback/common/models",
       "loopback/server/models",
       "../common/models",
-      "./models",
-      "../node_modules/loopback-component-passport/lib/models"
+      "./models"
     ],
     "mixins": [
       "loopback/common/mixins",
@@ -14,21 +13,20 @@
       "./mixins"
     ]
   },
-  "User": {
-    "dataSource": "db",
-    "public": false
-  },
-  "accessToken": {
+  "user": {
     "dataSource": "db",
     "public": true
   },
-  "userCredential": {
+  "AccessToken": {
     "dataSource": "db",
-    "public": true
-  },
-  "userIdentity": {
-    "dataSource": "db",
-    "public": true
+    "public": false,
+    "relations": {
+      "user": {
+        "type": "belongsTo",
+        "model": "user",
+        "foreignKey": "userId"
+      }
+    }
   },
   "ACL": {
     "dataSource": "db",
@@ -36,41 +34,19 @@
   },
   "RoleMapping": {
     "dataSource": "db",
-    "public": true
+    "public": false,
+    "options": {
+      "strictObjectIDCoercion": true
+    }
   },
   "Role": {
     "dataSource": "db",
-    "public": true
-  },
-  "AppModel": {
-    "dataSource": "db",
     "public": false
   },
-  "Slide": {
-    "dataSource": "db",
-    "public": true
+  "Note": {
+    "dataSource": "db"
   },
-  "Setting": {
-    "dataSource": "db",
-    "public": true
-  },
-  "Event": {
-    "dataSource": "db",
-    "public": true
-  },
-  "AuthProvider": {
-    "dataSource": "db",
-    "public": true
-  },
-  "user": {
-    "dataSource": "db",
-    "public": true
-  },
-  "Meta": {
-    "dataSource": "db",
-    "public": true
-  },
-  "Track": {
+  "Player": {
     "dataSource": "db",
     "public": true
   },
@@ -78,7 +54,15 @@
     "dataSource": "db",
     "public": true
   },
-  "Player": {
+  "Slide": {
+    "dataSource": "db",
+    "public": true
+  },
+  "Track": {
+    "dataSource": "db",
+    "public": true
+  },
+  "Setting": {
     "dataSource": "db",
     "public": true
   },

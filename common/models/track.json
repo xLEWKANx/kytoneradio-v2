@@ -3,6 +3,9 @@
   "plural": "tracks",
   "base": "PersistedModel",
   "idInjection": true,
+  "mixins": {
+    "AorMixin": {}
+  },
   "options": {
     "validateUpsert": true
   },
@@ -31,6 +34,9 @@
     },
     "processed": {
       "type": "boolean"
+    },
+    "error": {
+      "type": "object"
     }
   },
   "validations": [],
@@ -41,6 +47,40 @@
       "foreignKey": "trackId"
     }
   },
-  "acls": [],
-  "methods": {}
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY",
+      "accessType": "*"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "accessType": "READ"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "ADMIN",
+      "permission": "ALLOW",
+      "accessType": "*"
+    }
+  ],
+  "methods": {
+    "prototype.addToPlaylist": {
+      "returns": {
+        "arg": "playlist",
+        "type": "object",
+        "root": true
+      }
+    },
+    "scanDir": {
+      "returns": {
+        "arg": "body",
+        "type": "array",
+        "root": true
+      }
+    }
+  }
 }

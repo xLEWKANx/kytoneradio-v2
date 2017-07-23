@@ -7,31 +7,22 @@
   "relations": {
     "accessTokens": {
       "type": "hasMany",
-      "model": "accessToken",
-      "foreignKey": "userId"
-    },
-    "identities": {
-      "type": "hasMany",
-      "model": "userIdentity",
-      "foreignKey": "userId"
-    },
-    "credentials": {
-      "type": "hasMany",
-      "model": "userCredential",
+      "model": "AccessToken",
       "foreignKey": "userId"
     },
     "roles": {
       "type": "hasMany",
       "model": "Role",
+      "through": "RoleMapping",
       "foreignKey": "principalId",
-      "through": "RoleMapping"
+      "keyThrough": "roleId"
     }
   },
   "acls": [
     {
       "accessType": "*",
       "principalType": "ROLE",
-      "principalId": "admin",
+      "principalId": "ADMIN",
       "permission": "ALLOW"
     },
     {

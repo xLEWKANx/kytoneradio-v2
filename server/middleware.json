@@ -1,18 +1,49 @@
 {
   "initial:before": {
-    "loopback#favicon": {}
+    "loopback#favicon": {
+      "params": "./src/client/img/favicon.ico"
+    }
   },
   "initial": {
-    "compression": {},
     "cors": {
       "params": {
         "origin": true,
         "credentials": true,
         "maxAge": 86400
       }
+    },
+    "helmet#xssFilter": {},
+    "helmet#frameguard": {
+      "params": [
+        "deny"
+      ]
+    },
+    "helmet#hsts": {
+      "params": {
+        "maxAge": 0,
+        "includeSubdomains": true
+      }
+    },
+    "helmet#hidePoweredBy": {},
+    "helmet#ieNoOpen": {},
+    "helmet#noSniff": {},
+    "helmet#noCache": {
+      "enabled": false
     }
   },
-  "session": {},
+  "session": {
+    "express-session": {
+      "params": {
+        "secret": "My super session secret",
+        "resave": false,
+        "saveUninitialized": true,
+        "cookie": {
+          "httpOnly": true,
+          "secure": true
+        }
+      }
+    }
+  },
   "auth": {},
   "parse": {},
   "routes": {
@@ -34,15 +65,17 @@
         "paths": [
           "/dashboard"
         ],
-        "params": "$!../dist/dashboard"
+        "params": "$!../build"
       }
     ]
   },
   "final": {
-    "loopback#urlNotFound": {},
-    "./middleware/handle404": {}
+    "loopback#urlNotFound": {}
   },
   "final:after": {
-    "loopback#errorHandler": {}
+    "strong-error-handler": {
+      "debug": false,
+      "log": true
+    }
   }
 }

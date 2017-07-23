@@ -1,174 +1,221 @@
-"use strict";
-const mpd = require("mpd");
-const debug = require("debug");
+const mpd = require('mpd');
+const debug = require('debug');
 
-const request = require("request");
-const log = debug("player:Player");
+const createPromiseCallback = require('../../lib/utils').createPromiseCallback;
+const request = require('request');
+const log = debug('player:Player');
 
 module.exports = function(Player) {
   let client = {};
+
   let state = {
     isPlaying: false
   };
-  Player.on("error", err => {
-    Player.log({
-      error: err
-    });
-  });
 
-  Player.bootstrap = function (mpd, cb) {
+  Player.bootstrap = function(mpd, cb) {
+    try {
+      client = mpd.connect({
+        port: process.env.MPD_PORT || 6600,
+        host: 'localhost'
+      });
+    } catch (err) {
+      return cb(err);
+    }
 
-    client = mpd.connect({
-      port: process.env.MPD_PORT || 6600,
-      host: "localhost"
-    });
-    client.on("error", err => {
-      cb(err);
-      Player.emit("error", err);
+    client.on('error', err => {
+      console.error('mpd error: ', err);
+      return cb(err);
     });
 
-    client.on("ready", () => {
-      console.log("ready?");
+    client.on('ready', () => {
       cb(null, client);
     });
+
+    Promise.promisifyAll(client, { suffix: 'Async' });
   };
 
   Player.play = function(index, cb) {
-    if (typeof index === "function") {
+    if (typeof index === 'function') {
       cb = index;
       index = undefined;
     }
+    cb = cb || createPromiseCallback();
+
     let arg = index === undefined ? [] : [index];
-    client.sendCommand(mpd.cmd("play", arg), (err, msg) => {
-      if (err) return cb(err);
-      Player.emit("play");
-      state.isPlaying = true;
-      Player.log(
-        {
-          command: "play"
-        },
-        cb
-      );
-    });
+    Player.getStatus()
+      .then(status => {
+        if (status.state === 'play' && status.song == index) {
+          return cb(null, status);
+        } else {
+          client.sendCommand(mpd.cmd('play', arg), (err, msg) => {
+            if (err) return cb(err);
+            Player.log({
+              command: 'play'
+            }).then(log => Player.getStatus(cb));
+          });
+        }
+      })
+      .catch(cb);
+
+    return cb.promise;
   };
 
-  Player.remoteMethod("play", {
+  Player.remoteMethod('play', {
     accepts: {
-      arg: "index",
-      type: "number"
+      arg: 'index',
+      type: 'number'
     },
     returns: {
-      arg: "message",
-      type: "string"
+      arg: 'message',
+      type: 'string'
     }
   });
 
   Player.stop = function(cb) {
-    client.sendCommand(mpd.cmd("stop", []), (err, msg) => {
+    client.sendCommand(mpd.cmd('stop', []), (err, msg) => {
       if (err) return cb(err);
-      Player.emit("stop");
+      Player.emit('stop');
       state.isPlaying = false;
       Player.log(
         {
-          command: "stop"
+          command: 'stop'
         },
         cb
       );
     });
   };
 
-  Player.remoteMethod("stop", {
+  Player.remoteMethod('stop', {
     returns: {
-      arg: "message",
-      type: "string"
+      arg: 'message',
+      type: 'string'
     }
   });
 
   Player.addTrack = function(name, cb) {
-    client.sendCommand(mpd.cmd("add", [name]), (err, msg) => {
-      if (err) return cb(err);
-      log(`Added ${name} to MPD playlist`, err, msg);
-      Player.log(
-        {
-          command: "play",
-          messange: name
-        },
-        cb
-      );
-    });
+    cb = cb || createPromiseCallback();
+    client
+      .sendCommandAsync(mpd.cmd('add', [name]))
+      .then(msg => {
+        return Player.log(
+          {
+            command: 'add',
+            messange: name
+          },
+          cb
+        );
+      })
+      .catch(cb);
+
+    return cb.promise;
   };
 
   Player.getCurrentPlaylist = function(cb) {
-    client.sendCommand(mpd.cmd("playlistinfo", []), (err, msg) => {
+    client.sendCommand(mpd.cmd('playlistinfo', []), (err, msg) => {
       if (err) return cb(err);
       return cb(null, msg);
     });
   };
 
-  Player.remoteMethod("getCurrentPlaylist", {
+  Player.remoteMethod('getCurrentPlaylist', {
     returns: {
-      arg: "tracks",
-      type: "string"
+      arg: 'tracks',
+      type: 'string'
     }
   });
 
-  Player.clear = function (cb) {
-
-    client.sendCommand(mpd.cmd("clear", []), (err, msg) => {
+  Player.clear = function(cb) {
+    client.sendCommand(mpd.cmd('clear', []), (err, msg) => {
       if (err) return cb(err);
       Player.log(
         {
-          command: "clear"
+          command: 'clear'
         },
         cb
       );
     });
   };
 
-  Player.remoteMethod("clear", {
+  Player.remoteMethod('clear', {
     returns: {
-      arg: "message",
-      type: "string"
+      arg: 'message',
+      type: 'string'
     }
   });
 
   Player.deleteTrack = function(position, cb) {
-    client.sendCommand(mpd.cmd("delete", [position]), (err, msg) => {
+    cb = cb || createPromiseCallback();
+
+    client.sendCommand(mpd.cmd('delete', [position]), (err, msg) => {
       if (err) return cb(err);
       return cb(null, msg);
     });
+
+    return cb.promise;
   };
 
-  Player.moveTrack = function(require, to, cb) {
-    client.sendCommand(mpd.cmd("move", [require, to]), (err, msg) => {
+  Player.moveTrack = function(from, to, cb) {
+    cb = cb || createPromiseCallback();
+
+    client.sendCommand(mpd.cmd('move', [from, to]), (err, msg) => {
       if (err) return cb(err);
       return cb(null, msg);
     });
+
+    return cb.promise;
   };
 
   Player.getStatus = function(cb) {
-    client.sendCommand(mpd.cmd("status", []), (err, msg) => {
+    cb = cb || createPromiseCallback();
+    client.sendCommand(mpd.cmd('status', []), (err, msg) => {
       if (err) return cb(err);
       if (msg) msg = mpd.parseKeyValueMessage(msg);
       return cb(null, msg || {});
     });
+
+    return cb.promise;
   };
 
-  Player.remoteMethod("getStatus", {
+  Player.playlist = function(cb) {
+    cb = cb || createPromiseCallback();
+    client.sendCommand(mpd.cmd('playlist', []), (err, msg) => {
+      if (err) return cb(err);
+      if (msg) msg = mpd.parseKeyValueMessage(msg);
+      return cb(null, Player.parsePlaylist(msg) || {});
+    });
+
+    return cb.promise;
+  };
+
+  Player.parsePlaylist = function(mpdPlaylist) {
+    let playlist = {};
+    const INDEX_REGEXP = /^\d+/;
+    for (let key in mpdPlaylist) {
+      let pkey = key.match(INDEX_REGEXP);
+      playlist[pkey] = mpdPlaylist[key];
+    }
+    return playlist;
+  };
+
+  Player.remoteMethod('getStatus', {
     http: {
-      verb: "get"
+      verb: 'get'
     },
     returns: {
-      arg: "status",
-      type: "string"
+      arg: 'status',
+      type: 'string'
     }
   });
 
   Player.currentTrackIndex = function(cb) {
+    cb = cb || createPromiseCallback();
+
     Player.getStatus((err, status) => {
       if (err) return cb(err);
       return cb(null, status.song || 0);
     });
+
+    return cb.promise;
   };
 
   Player.nextTrackIndex = function(cb) {
@@ -180,43 +227,69 @@ module.exports = function(Player) {
   };
 
   Player.updateDatabase = function(cb) {
-    client.sendCommand(mpd.cmd("update", []), (err, msg) => {
+    client.sendCommand(mpd.cmd('update', []), (err, msg) => {
       if (err) return cb(err);
-      log("database updated", msg);
+      log('database updated', msg);
       return cb(null, msg);
     });
   };
 
-  Player.getState = function() {
-    return state;
-  };
-
   Player.log = function(info, cb) {
-    let log = Object.assign(
-      {
-        timestamp: new Date()
-      },
-      info
-    );
-    Player.create(log, cb)
-    // cb && cb();
-    // cb(null, [])
+    cb = cb || createPromiseCallback();
+
+    let getStatus = info.status ?
+      () => Promise.resolve(info.status) :
+      Player.getStatus;
+
+    getStatus()
+      .then(status => {
+        let log = Object.assign(
+          {
+            timestamp: new Date(),
+            status
+          },
+          info
+        );
+        return Player.create(log, cb);
+      })
+      .catch(cb);
+
+    return cb.promise;
   };
 
-  Player.stream = function(cb) {
-    let stream = request("http://localhost:15001/stream");
-    cb(null, stream, "application/octet-stream");
+  Player.stream = function(req, res, cb) {
+    const options = {
+      url: 'http://localhost:15001/stream',
+      headers: {
+        'User-Agent': 'request'
+      }
+    };
+    let stream = request.get(options)
+      .on('error', err => {
+        return cb('Stream is no avalible');
+      })
+      .on('response', () => {
+        return cb(null, stream, 'application/octet-stream');
+      });
+
+    req.on('close', () => {
+      stream.abort();
+    });
   };
 
-  Player.remoteMethod("stream", {
+  Player.remoteMethod('stream', {
     http: {
-      verb: "get"
+      verb: 'get'
     },
+    accepts: [
+      { arg: 'req', type: 'object', http: { source: 'req' } },
+      { arg: 'req', type: 'object', http: { source: 'res' } }
+    ],
     returns: [
-      { arg: "body", type: "file", root: true },
-      { arg: "Content-Type", type: "string", http: { target: "header" } }
+      { arg: 'body', type: 'file', root: true },
+      { arg: 'Content-Type', type: 'string', http: { target: 'header' } }
     ]
   });
 
-  Promise.promisifyAll(Player, { suffix: "Promised" });
+  Promise.promisifyAll(Player, { suffix: 'Promised' });
 };

@@ -1,11 +1,10 @@
 (function() {
-  "use strict";
   angular
-    .module("kytoneApp")
-    .controller("mainCtrl", mainCtrl)
-    .controller("postersCtrl", postersCtrl)
-    .controller("postCtrl", postCtrl)
-    .controller("scheduleCtrl", scheduleCtrl);
+    .module('kytoneApp')
+    .controller('mainCtrl', mainCtrl)
+    .controller('postersCtrl', postersCtrl)
+    .controller('postCtrl', postCtrl)
+    .controller('scheduleCtrl', scheduleCtrl);
 
   function mainCtrl($scope, localStorageService, Setting) {
     var vm = this;
@@ -14,24 +13,23 @@
       vm.slidersArr = result.options;
       for (var key in result.options) {
         if (result.options[key].isBig) {
-          result.options[key].wrapperClass = "cover-wrapper-big";
+          result.options[key].wrapperClass = 'cover-wrapper-big';
         }
       }
     });
 
-    vm.playerStatus = "Loading";
+    vm.playerStatus = 'Loading';
     vm.control = function(target) {
       function playStatus(val) {
-        return localStorageService.set("isPlaying", val);
+        return localStorageService.set('isPlaying', val);
       }
-      console.log("angular.element", target);
 
-      if (target === "play") {
+      if (target === 'play') {
         playStatus(true);
-        angular.element("#player")[0].play();
+        angular.element('#player')[0].play();
       } else {
         playStatus(false);
-        angular.element("#player")[0].pause();
+        angular.element('#player')[0].pause();
       }
     };
   }
@@ -74,14 +72,22 @@
     };
   }
 
-  function scheduleCtrl($scope, socket, Schedule) {
+  function scheduleCtrl($scope, socket, Playlist) {
     var vm = this;
-    socket.on("playlist", function(data) {
-      data.forEach(function(track) {
-        track.startTime = moment(track.startTime).format("HH:mm");
-        track.endTime = moment(track.endTime).format("HH:mm");
-      });
-      vm.next = data;
+    Playlist.getSchedule().$promise.then(function(tracks) {
+      vm.next = formatTracks(tracks);
+    });
+
+    socket.on('playlist', function(data) {
+      vm.next = formatTracks(data);
+    });
+  }
+
+  function formatTracks(data) {
+    return data.map(function(track) {
+      track.startTime = moment(track.startTime).format('HH:mm');
+      track.endTime = moment(track.endTime).format('HH:mm');
+      return track;
     });
   }
 })();

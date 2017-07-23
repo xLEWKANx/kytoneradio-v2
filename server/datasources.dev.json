@@ -1,0 +1,14 @@
+{
+  "db": {
+    "url": "${MDB_DEV_URL}",
+    "connector": "mongodb",
+    "name": "db"
+  },
+  "storage": {
+    "name": "trackStorage",
+    "provider": "filesystem",
+    "connector": "loopback-component-storage",
+    "root": "./storage",
+    "maxFileSize": "524288000"
+  }
+}

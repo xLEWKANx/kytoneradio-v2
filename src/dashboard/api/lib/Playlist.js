@@ -1,7 +1,7 @@
 import Track from './Track';
 import { fetchJson, queryParams } from '../utils/fetch';
 
-const api = 'http://localhost:3027/api';
+const api = '/api';
 class Playlist {
   constructor(model) {
     Object.assign(this, model);

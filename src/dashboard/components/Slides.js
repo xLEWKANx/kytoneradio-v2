@@ -28,15 +28,18 @@ import { Grid, Row, Col } from 'react-flexbox-grid';
 
 import { Preview } from './Preview';
 
-const PostFilter = props => (
+const PostFilter = props =>
   <Filter {...props}>
     <NumberInput source="outerIndex" alwaysOn />
     <NumberInput source="innerIndex" />
-  </Filter>
-);
+  </Filter>;
 
-export const SlideList = props => (
-  <List {...props} filters={<PostFilter />}>
+export const SlideList = props =>
+  <List
+    {...props}
+    sort={{ field: 'outerIndex', order: 'ASC' }}
+    filters={<PostFilter />}
+  >
     <Datagrid>
       <BooleanField source="local" label="is post?" />
       <NumberField source="outerIndex" label="row" />
@@ -45,26 +48,24 @@ export const SlideList = props => (
       <ConditionalField
         label="content"
         render={record =>
-          (record.local ?
+          record.local ?
             <TextField source="content" /> :
-            <TextField source="outerUrl" />)}
+            <TextField source="outerUrl" />}
       />
       <EditButton />
     </Datagrid>
-  </List>
-);
+  </List>;
 
 const SlideTitle = ({ record }) => {
   return (
     <span>
-      Slide
-      {' '}
+      Slide{' '}
       {record ? `edit "${record.outerIndex} - ${record.innerIndex}"` : 'create'}
     </span>
   );
 };
 
-const SlideEditActions = ({ basePath, data, refresh }) => (
+const SlideEditActions = ({ basePath, data, refresh }) =>
   <CardActions>
     <ListButton basePath={basePath} />
     <DeleteButton
@@ -78,8 +79,7 @@ const SlideEditActions = ({ basePath, data, refresh }) => (
       onClick={refresh}
       icon={<NavigationRefresh />}
     />
-  </CardActions>
-);
+  </CardActions>;
 
 function mapStateToProps(state, props) {
   return {
@@ -110,7 +110,7 @@ const SlideContent = connect(mapStateToProps)(props => {
   );
 });
 
-export const SlideEdit = props => (
+export const SlideEdit = props =>
   <Grid fluid>
     <Row>
       <Col xs={12} md={6}>
@@ -122,10 +122,9 @@ export const SlideEdit = props => (
         <Preview {...props} />
       </Col>
     </Row>
-  </Grid>
-);
+  </Grid>;
 
-export const SlideCreate = props => (
+export const SlideCreate = props =>
   <Grid fluid>
     <Row>
       <Col xs={12} md={6}>
@@ -137,5 +136,4 @@ export const SlideCreate = props => (
         <Preview {...props} />
       </Col>
     </Row>
-  </Grid>
-);
+  </Grid>;

@@ -1,6 +1,6 @@
 import { fetchJson, queryParams } from '../utils/fetch';
 
-const api = 'http://localhost:3027/api';
+const api = '/api';
 class Setting {
   constructor(model) {
     Object.assign(this, model);

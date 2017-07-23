@@ -518,10 +518,12 @@ module.exports = function(Playlist) {
         return track.play();
       })
       .then(() => {
-        return Playlist.updatePlaylist();
+        return Playlist.updatePlaylist().then(() => Playlist.getSchedule());
       })
       .then(tracks => {
         log('Playlist.play | playing', tracks[0]);
+        Playlist.app.io.emit('track', tracks[0]);
+        Playlist.app.io.emit('playlist', tracks);
         return cb(null, tracks[0]);
       })
       .catch(cb);
@@ -551,8 +553,6 @@ module.exports = function(Playlist) {
     Player.play(this.index)
       .then(() => Playlist.getSchedule())
       .then(tracks => {
-        Playlist.app.io.emit('track', tracks[0]);
-        Playlist.app.io.emit('playlist', tracks);
         return cb(null, { nextTrack: this.endTime });
       })
       .catch(cb);

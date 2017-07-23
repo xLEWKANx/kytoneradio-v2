@@ -6,7 +6,8 @@ import {
   TextField,
   DeleteButton,
   Filter,
-  showNotification as showNotificationAction
+  showNotification as showNotificationAction,
+  changeListParams
 } from 'admin-on-rest';
 import Datagrid from '../../aor-components/list/Datagrid';
 import { connect } from 'react-redux';
@@ -33,7 +34,7 @@ const PlaylistFilter = props =>
     />
   </Filter>;
 
-class PlayListContainer extends Component {
+class PlayList extends Component {
   handlePositionChange = ({ oldIndex, newIndex, item, replacedItem }) => {
     let { showNotification } = this.props;
 
@@ -57,13 +58,14 @@ class PlayListContainer extends Component {
   };
 
   render() {
-    let { showNotification, ...props } = this.props;
+    let { showNotification, total, pages, ...props } = this.props;
+
     return (
       <div>
         <List
           {...props}
           sort={{ field: 'startTime', order: 'ASC' }}
-          list={{}}
+          perPage={total}
           filters={<PlaylistFilter />}
           actions={<PlaylistActions />}
         >
@@ -82,7 +84,6 @@ class PlayListContainer extends Component {
                 maxWidth: 25
               }}
             />
-
             <FunctionField
               label="Start Time"
               render={record => moment(record.startTime).format('HH:mm:ss')}
@@ -101,6 +102,10 @@ class PlayListContainer extends Component {
   }
 }
 
-export let PlayList = connect(null, {
+export default connect((state) => ({
+  params: state.admin.playlist.list.params,
+  total: state.admin.playlist.list.total,
+}), {
+  changeListParams,
   showNotification: showNotificationAction
-})(PlayListContainer);
+})(PlayList);

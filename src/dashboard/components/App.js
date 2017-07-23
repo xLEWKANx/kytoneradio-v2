@@ -15,6 +15,7 @@ import PlaylistIcon from 'material-ui/svg-icons/av/queue-music';
 
 const App = () =>
   <Admin
+    title="Kytone Radio Dashboard"
     customReducers={{ reducers }}
     customSagas={[uploadSaga]}
     authClient={authClient('http://localhost:3027/api/users/login')}

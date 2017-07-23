@@ -23,7 +23,6 @@
       function playStatus(val) {
         return localStorageService.set('isPlaying', val);
       }
-      console.log('angular.element', target);
 
       if (target === 'play') {
         playStatus(true);

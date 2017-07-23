@@ -73,9 +73,11 @@
           angular.element(element).find('p').text(pTrack.track.title);
         });
         socket.on('track', function(pTrack) {
-          if (pTrack.track) {
+          if (!pTrack.track) {
             angular.element(element).find('p').text('Kytone Radio (c)');
-          } else angular.element(element).find('p').text(pTrack.track.title);
+          } else {
+            angular.element(element).find('p').text(pTrack.track.title);
+          }
         });
         $(element).liMarquee();
       }

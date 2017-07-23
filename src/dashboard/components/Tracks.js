@@ -65,12 +65,12 @@ let TrackActions = ({
       icon={<LibraryAddIcon />}
       onClick={e => {
         e.persist();
-        Track.scanDir().then(res => {
-          showNotification(`${res.length} new tracks`);
-          refresh(e);
-        }).catch((err) =>
-          showNotification(`Error: ${err.message}`, 'warning')
-        );
+        Track.scanDir()
+          .then(res => {
+            showNotification(`${res.length} new tracks`);
+            refresh(e);
+          })
+          .catch(err => showNotification(`Error: ${err.message}`, 'warning'));
       }}
     />
   </CardActions>;
@@ -87,7 +87,12 @@ const TrackFilter = props =>
 export let TrackList = ({ showNotification, ...props }) =>
   <div>
     <Uploader />
-    <List {...props} filters={<TrackFilter />} actions={<TrackActions />}>
+    <List
+      {...props}
+      perPage={25}
+      filters={<TrackFilter />}
+      actions={<TrackActions />}
+    >
       <Datagrid>
         <FunctionField
           label="Time"
@@ -103,12 +108,15 @@ export let TrackList = ({ showNotification, ...props }) =>
           disabledField="processed"
           icon={<PlaylistAddIcon />}
           onClick={(e, record) => {
-            new Track(record).addToPlaylist().then(res => {
-              let startTime = moment(res.startTime).format('HH:mm:ss');
-              showNotification(`Track will be played at ${startTime}`);
-            }).catch((err) =>
-              showNotification(`Error: ${err.message}`, 'warning')
-            );
+            new Track(record)
+              .addToPlaylist()
+              .then(res => {
+                let startTime = moment(res.startTime).format('DD MMM HH:mm:ss');
+                showNotification(`Track will be played at ${startTime}`);
+              })
+              .catch(err =>
+                showNotification(`Error: ${err.message}`, 'warning')
+              );
           }}
         />
         <EditButton />

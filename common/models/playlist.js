@@ -231,13 +231,17 @@ module.exports = function(Playlist) {
     Promise.all(promises)
       .then(res => {
         let [playlist, mpdPlaylist] = res;
-        log('check index', mpdPlaylist, playlist);
+        // log('check index', mpdPlaylist, playlist);
+        log('check index', playlist.length, Object.keys(mpdPlaylist).length);
 
         if (playlist.length !== Object.keys(mpdPlaylist).length) {
           return Promise.reject(new Error("playlist don't match"));
         }
+
         let allMatch = playlist.every(
-          track => mpdPlaylist[track.index] === track.name
+          (track, i) => {
+            return mpdPlaylist[track.index] === track.name;
+          }
         );
 
         if (!allMatch) {
@@ -282,15 +286,18 @@ module.exports = function(Playlist) {
       })
       .then(tracks => {
         let mpdTracks = _.values(mpdPlaylist);
-        let sorted = [];
-        tracks.forEach(track => {
-          let index = mpdTracks.indexOf(track.name);
-          sorted[index] = track;
+
+        let sorted = mpdTracks.map((name, i) => {
+          let track = _.find(tracks, { name: name });
+          if (!track) Promise.reject('Track in mpd but not in Track collection');
+          return track;
         });
 
         return sorted;
       })
-      .mapSeries(track => Playlist.add(track))
+      .mapSeries(track => {
+        return Playlist.add(track);
+      })
       .then(tracks => cb(null, tracks))
       .catch(cb);
 
@@ -495,6 +502,7 @@ module.exports = function(Playlist) {
         where: { index }
       }) :
       Player.getStatus().then(status => {
+        index = status.song;
         return Playlist.findOne({
           where: { index: status.song }
         });

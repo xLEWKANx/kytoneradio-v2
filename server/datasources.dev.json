@@ -1,6 +1,6 @@
 {
   "db": {
-    "url": "mongodb://admin:radio@ds017256.mlab.com:17256/kytone",
+    "url": "${MDB_DEV_URL}",
     "connector": "mongodb",
     "name": "db"
   },

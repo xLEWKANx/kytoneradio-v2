@@ -4,13 +4,11 @@ import {
   FunctionField,
   DateInput,
   TextField,
-  EditButton,
   Edit,
   SimpleForm,
   TextInput,
   DeleteButton,
   Filter,
-  refresh,
   showNotification as showNotificationAction
 } from 'admin-on-rest';
 import Datagrid from '../aor-components/list/Datagrid';
@@ -160,7 +158,6 @@ export let PlayList = ({ showNotification, ...props }) =>
           default
           icon={<PlayIcon />}
           onClick={(e, record) => {
-            console.log('record', record, record.index);
             Playlist.play(record.index).then(track => {
               showNotification(`Playing track ${track.name}`);
             }).catch((err) =>
@@ -168,7 +165,6 @@ export let PlayList = ({ showNotification, ...props }) =>
             );
           }}
         />
-        <EditButton />
         <DeleteButton />
       </Datagrid>
     </List>

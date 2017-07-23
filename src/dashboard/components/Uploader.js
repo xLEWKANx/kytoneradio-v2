@@ -48,7 +48,7 @@ class Uploader extends Component {
       data.append('file', file);
 
       return futch(
-        'http://localhost:3027/api/musicStorages/music/upload',
+        '/api/musicStorages/music/upload',
         {
           method: 'POST',
           body: data

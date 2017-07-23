@@ -98,7 +98,8 @@ class Datagrid extends Component {
       options,
       headerOptions,
       bodyOptions,
-      rowOptions
+      rowOptions,
+      onPositionChange
     } = this.props;
     let table = null;
     return (
@@ -143,6 +144,7 @@ class Datagrid extends Component {
           isLoading={isLoading}
           options={bodyOptions}
           rowOptions={rowOptions}
+          onPositionChange={onPositionChange}
         >
           {children}
         </DatagridBody>
@@ -167,6 +169,7 @@ Datagrid.propTypes = {
   resource: PropTypes.string,
   rowOptions: PropTypes.object,
   rowStyle: PropTypes.func,
+  onPositionChange: PropTypes.func,
   setSort: PropTypes.func,
   styles: PropTypes.object
 };

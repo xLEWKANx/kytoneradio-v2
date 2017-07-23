@@ -18,9 +18,9 @@ const App = () =>
     title="Kytone Radio Dashboard"
     customReducers={{ reducers }}
     customSagas={[uploadSaga]}
-    authClient={authClient('http://localhost:3027/api/users/login')}
+    authClient={authClient('/api/users/login')}
     restClient={loopbackRestClient(
-      'http://localhost:3027/api',
+      '/api',
       undefined,
       filterTransform
     )}

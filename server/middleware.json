@@ -1,6 +1,8 @@
 {
   "initial:before": {
-    "loopback#favicon": {}
+    "loopback#favicon": {
+      "params": "./src/client/img/favicon.ico"
+    }
   },
   "initial": {
     "cors": {
@@ -63,7 +65,7 @@
         "paths": [
           "/dashboard"
         ],
-        "params": "$!../dist/dashboard"
+        "params": "$!../build"
       }
     ]
   },

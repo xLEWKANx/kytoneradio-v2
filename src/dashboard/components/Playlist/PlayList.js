@@ -6,14 +6,16 @@ import {
   TextField,
   DeleteButton,
   Filter,
-  showNotification as showNotificationAction,
-  changeListParams
+  showNotification,
+  changeListParams,
+  crudGetList
 } from 'admin-on-rest';
 import Datagrid from '../../aor-components/list/Datagrid';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
 import PlaylistActions from './PlaylistActions';
+
 import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 
 import ListButton from '../../aor-components/buttons/ListButton';
@@ -38,9 +40,25 @@ class PlayList extends Component {
   handlePositionChange = ({ oldIndex, newIndex, item, replacedItem }) => {
     let { showNotification } = this.props;
 
+    showNotification(
+      `Moving track from ${item.index} to ${replacedItem.index} position`
+    );
     Playlist.moveTrack(item.index, replacedItem.index)
       .then(newPlaylist => {
-        // return refresh();
+        const { sort, order, page, perPage, filter } = this.props.params;
+        const { showNotification } = this.props;
+        const pagination = {
+          page: parseInt(page, 10),
+          perPage: parseInt(perPage, 10)
+        };
+        showNotification('Success');
+
+        this.props.crudGetList(
+          this.props.resource,
+          pagination,
+          { field: sort, order },
+          { ...filter }
+        );
       })
       .catch(err => {
         showNotification(`Error: ${err}`, 'warning');
@@ -102,10 +120,14 @@ class PlayList extends Component {
   }
 }
 
-export default connect((state) => ({
-  params: state.admin.playlist.list.params,
-  total: state.admin.playlist.list.total,
-}), {
-  changeListParams,
-  showNotification: showNotificationAction
-})(PlayList);
+export default connect(
+  state => ({
+    params: state.admin.playlist.list.params,
+    total: state.admin.playlist.list.total
+  }),
+  {
+    showNotification,
+    changeListParams,
+    crudGetList
+  }
+)(PlayList);
